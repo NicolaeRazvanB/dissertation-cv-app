@@ -4,33 +4,37 @@ const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      min: 2,
-      max: 20,
+      minlength: 2,
+      maxlength: 20,
       required: true,
     },
     lastName: {
       type: String,
-      min: 2,
-      max: 20,
+      minlength: 2,
+      maxlength: 20,
       required: true,
     },
     email: {
       type: String,
       required: true,
-      min: 5,
-      max: 30,
+      minlength: 5,
+      maxlength: 50,
       unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
     },
     cvs: [
       {
-        type: mongoose.Schema.Types.ObjectId, // Reference to CV by ID
+        type: mongoose.Schema.Types.ObjectId,
         default: [],
         ref: "CV",
       },
     ],
     deployedCVs: [
       {
-        type: mongoose.Schema.Types.ObjectId, // Reference to DeployedCV by ID
+        type: mongoose.Schema.Types.ObjectId,
         default: [],
         ref: "DeployedCV",
       },
