@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const helmet = require("helmet");
 const authRoute = require("./routes/auth");
+const cvRoute = require("./routes/cv");
 dotenv.config();
 
 mongoose
@@ -16,6 +17,8 @@ mongoose
 app.use(express.json());
 app.use(helmet());
 app.use("/api/auth", authRoute);
+app.use("/api/cv", cvRoute);
+
 // Middleware to handle 500 status errors.
 app.use((error, request, response, next) => {
   console.error(`[ERROR]: ${error}`);
