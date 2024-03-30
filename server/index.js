@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const helmet = require("helmet");
 const authRoute = require("./routes/auth");
 const cvRoute = require("./routes/cv");
+const logger = require("morgan");
 dotenv.config();
 
 mongoose
@@ -16,6 +17,7 @@ mongoose
 
 app.use(express.json());
 app.use(helmet());
+app.use(logger("dev"));
 app.use("/api/auth", authRoute);
 app.use("/api/cv", cvRoute);
 

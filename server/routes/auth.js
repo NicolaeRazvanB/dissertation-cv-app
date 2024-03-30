@@ -1,9 +1,12 @@
 const router = require("express").Router();
 const User = require("../models/User");
+const CV = require("../models/CV");
+// const DeployedCV = require("../models/DeployedCV");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
+const { verifyToken } = require("../utils");
 const JWT_SECRET = process.env.JWT_SECRET;
 const saltRounds = 10;
 
@@ -56,6 +59,78 @@ router.post("/login", async (request, response, next) => {
     response.status(200).json({ ...userData, token });
   } catch (error) {
     next(error);
+  }
+});
+
+// GET USER
+router.get("/user", verifyToken, async (req, res, next) => {
+  try {
+    // Assuming the user ID is attached to the request by the verifyToken middleware
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    // Optionally, exclude sensitive information
+    const { password, ...userDetails } = user.toObject();
+    res.json(userDetails);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+//UPDATE USER
+router.put("/user", verifyToken, async (req, res, next) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: req.body },
+      { new: true }
+    );
+    const { password, ...userDetails } = updatedUser.toObject();
+    res.json(userDetails);
+  } catch (error) {
+    next(error);
+  }
+});
+
+//DELETE USER
+router.delete("/user", verifyToken, async (req, res) => {
+  try {
+    // Check if the user exists (optional, based on your logic in verifyToken)
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Check for existing CVs
+    const cvCount = await CV.countDocuments({ userId: req.user.id });
+    if (cvCount > 0) {
+      await CV.deleteMany({ userId: req.user.id });
+    }
+
+    // Check for existing deployed CVs
+    // const deployedCvCount = await DeployedCV.countDocuments({
+    //   userId: req.user.id,
+    // });
+    // if (deployedCvCount > 0) {
+    //   await DeployedCV.deleteMany({ userId: req.user.id });
+    // }
+
+    // Proceed to delete the user after checking/deleting CVs and deployed CVs
+    await User.findByIdAndDelete(req.user.id);
+
+    // Construct a response message
+    let message = "User deleted successfully.";
+    if (cvCount > 0) {
+      message += ` ${cvCount} CV(s) deleted.`;
+    }
+    // if (deployedCvCount > 0) {
+    //   message += ` ${deployedCvCount} deployed CV(s) deleted.`;
+    // }
+
+    res.json({ message });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
