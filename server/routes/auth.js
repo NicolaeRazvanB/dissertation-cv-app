@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const User = require("../models/User");
 const CV = require("../models/CV");
-// const DeployedCV = require("../models/DeployedCV");
+const DeployedCV = require("../models/DeployedCV");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
@@ -70,11 +70,10 @@ router.get("/user", verifyToken, async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    // Optionally, exclude sensitive information
     const { password, ...userDetails } = user.toObject();
     res.json(userDetails);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 
@@ -94,7 +93,7 @@ router.put("/user", verifyToken, async (req, res, next) => {
 });
 
 //DELETE USER
-router.delete("/user", verifyToken, async (req, res) => {
+router.delete("/user", verifyToken, async (req, res, next) => {
   try {
     // Check if the user exists (optional, based on your logic in verifyToken)
     const user = await User.findById(req.user.id);
@@ -109,28 +108,27 @@ router.delete("/user", verifyToken, async (req, res) => {
     }
 
     // Check for existing deployed CVs
-    // const deployedCvCount = await DeployedCV.countDocuments({
-    //   userId: req.user.id,
-    // });
-    // if (deployedCvCount > 0) {
-    //   await DeployedCV.deleteMany({ userId: req.user.id });
-    // }
+    const deployedCvCount = await DeployedCV.countDocuments({
+      userId: req.user.id,
+    });
+    if (deployedCvCount > 0) {
+      await DeployedCV.deleteMany({ userId: req.user.id });
+    }
 
     // Proceed to delete the user after checking/deleting CVs and deployed CVs
     await User.findByIdAndDelete(req.user.id);
 
-    // Construct a response message
     let message = "User deleted successfully.";
     if (cvCount > 0) {
       message += ` ${cvCount} CV(s) deleted.`;
     }
-    // if (deployedCvCount > 0) {
-    //   message += ` ${deployedCvCount} deployed CV(s) deleted.`;
-    // }
+    if (deployedCvCount > 0) {
+      message += ` ${deployedCvCount} deployed CV(s) deleted.`;
+    }
 
     res.json({ message });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 

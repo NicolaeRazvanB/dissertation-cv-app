@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const helmet = require("helmet");
 const authRoute = require("./routes/auth");
 const cvRoute = require("./routes/cv");
+const deployedCVRoute = require("./routes/deployedCV");
 const logger = require("morgan");
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use(helmet());
 app.use(logger("dev"));
 app.use("/api/auth", authRoute);
 app.use("/api/cv", cvRoute);
+app.use("/api/deployedCV", deployedCVRoute);
 
 // Middleware to handle 500 status errors.
 app.use((error, request, response, next) => {

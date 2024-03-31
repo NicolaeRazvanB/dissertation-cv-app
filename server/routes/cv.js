@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const CV = require("../models/CV"); // Correctly import your CV model here
+const CV = require("../models/CV");
+const DeployedCV = require("../models/DeployedCV");
 const { verifyToken } = require("../utils");
 
 // POST CV
-router.post("/postCV", verifyToken, async (req, res) => {
+router.post("/postCV", verifyToken, async (req, res, next) => {
   const cvData = {
     ...req.body,
     userId: req.user.id, // Assuming the user ID is stored in the JWT payload
@@ -15,22 +16,22 @@ router.post("/postCV", verifyToken, async (req, res) => {
     const savedCV = await newCV.save();
     res.status(201).json(savedCV);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 
 //GET all cvs of one user
-router.get("/my-cvs", verifyToken, async (req, res) => {
+router.get("/my-cvs", verifyToken, async (req, res, next) => {
   try {
     const cvs = await CV.find({ userId: req.user.id });
     res.status(200).json(cvs);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 
 //GET CV BY ID
-router.get("/:id", verifyToken, async (req, res) => {
+router.get("/:id", verifyToken, async (req, res, next) => {
   try {
     const cv = await CV.findById(req.params.id);
     if (!cv) {
@@ -41,12 +42,12 @@ router.get("/:id", verifyToken, async (req, res) => {
     }
     res.status(200).json(cv);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 
 //EDIT A CV
-router.put("/:id", verifyToken, async (req, res) => {
+router.put("/:id", verifyToken, async (req, res, next) => {
   const { id } = req.params;
   try {
     const cv = await CV.findById(id);
@@ -66,12 +67,12 @@ router.put("/:id", verifyToken, async (req, res) => {
     );
     res.status(200).json(updatedCV);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 
 //DELETE A CV
-router.delete("/:id", verifyToken, async (req, res) => {
+router.delete("/:id", verifyToken, async (req, res, next) => {
   const { id } = req.params;
   try {
     const cv = await CV.findById(id);
@@ -84,10 +85,17 @@ router.delete("/:id", verifyToken, async (req, res) => {
         .json({ message: "User not authorized to delete this CV" });
     }
 
+    // Delete the CV
     await CV.findByIdAndDelete(id);
-    res.status(200).json({ message: "CV deleted successfully" });
+
+    // Additionally, delete any deployed versions of the CV
+    await DeployedCV.deleteMany({ cvId: id });
+
+    res
+      .status(200)
+      .json({ message: "CV and its deployed versions deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 
