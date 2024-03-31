@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   const { userInfo } = useContext(AuthContext);
