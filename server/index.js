@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const helmet = require("helmet");
+const cors = require("cors");
 const authRoute = require("./routes/auth");
 const cvRoute = require("./routes/cv");
 const deployedCVRoute = require("./routes/deployedCV");
