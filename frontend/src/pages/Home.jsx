@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   Button,
   Container,
@@ -9,24 +9,44 @@ import {
   Card,
 } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
-import { Logout } from "../context/AuthActions";
+import NavbarComponent from "../components/NavbarComponent";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { requestOptions, base_url } from "../requestOptions";
 
 const HomePage = () => {
   const { userInfo, dispatch } = useContext(AuthContext);
   const navigate = useNavigate(); // Initialize useNavigate
+  const [cvs, setCvs] = useState([]); // State to store CVs
 
-  const handleLogout = () => {
-    localStorage.removeItem("userInfo"); // Remove user info from localStorage
-    dispatch(Logout());
-  };
+  useEffect(() => {
+    const fetchCVs = async () => {
+      try {
+        const token = userInfo.token; // Extract token from userInfo
+        const requestParams = {
+          ...requestOptions,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include bearer token in headers
+          },
+        };
 
-  // Dummy data for CVs, replace with your actual data source
-  const cvs = [
-    { id: 1, title: "CV 1" },
-    { id: 2, title: "CV 2" },
-    // Add more CVs here
-  ];
+        // Fetch user's CVs (GET request, so no body)
+        const response = await fetch(base_url + "api/cv/my-cvs", requestParams);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("CVs Data:", data);
+          setCvs(data); // Update CVs state with fetched data
+        } else {
+          throw new Error("Failed to fetch CVs");
+        }
+      } catch (error) {
+        console.error("Error fetching CVs:", error);
+      }
+    };
+
+    fetchCVs(); // Call fetchCVs function when component mounts
+  }, [userInfo.cvs]); // Fetch CVs when userInfo changes
 
   const handleAddCV = () => {
     navigate("/addCV"); // Navigate to addCV route
@@ -42,12 +62,7 @@ const HomePage = () => {
 
   return (
     <>
-      <Navbar bg="primary" variant="dark" className="justify-content-between">
-        <Navbar.Brand className="mx-auto">MagickalResume</Navbar.Brand>
-        <Button variant="outline-light" onClick={handleLogout}>
-          Logout
-        </Button>
-      </Navbar>
+      <NavbarComponent></NavbarComponent>
       <Container fluid>
         <Row>
           <Col xs={2} className="bg-light p-3 sidebar">
@@ -91,17 +106,21 @@ const HomePage = () => {
             <h2>My CVs</h2>
             <Row xs={1} md={2} lg={3} className="g-4">
               {cvs.map((cv) => (
-                <Col key={cv.id}>
+                <Col key={cv._id}>
                   <Card>
-                    <Card.Body>
-                      <Card.Title>{cv.title}</Card.Title>
-                      <Button variant="secondary" className="me-2">
-                        View
-                      </Button>
-                      <Button variant="info" className="me-2">
-                        Edit
-                      </Button>
-                      <Button variant="danger">Delete</Button>
+                    <Card.Body className="d-flex flex-column align-items-center justify-content-center">
+                      <Card.Title className="text-center mb-4">
+                        {cv.cvName}
+                      </Card.Title>
+                      <div className="d-flex justify-content-center">
+                        <Button variant="secondary" className="me-2">
+                          View
+                        </Button>
+                        <Button variant="info" className="me-2">
+                          Edit
+                        </Button>
+                        <Button variant="danger">Delete</Button>
+                      </div>
                     </Card.Body>
                   </Card>
                 </Col>
