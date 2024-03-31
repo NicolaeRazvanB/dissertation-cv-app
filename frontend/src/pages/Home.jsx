@@ -103,10 +103,13 @@ const HomePage = () => {
             </Nav>
           </Col>
           <Col>
-            <h2>My CVs</h2>
-            <Row xs={1} md={2} lg={3} className="g-4">
+            <div className="d-flex justify-content-center">
+              <h2>My CVs</h2>
+            </div>
+            {/* Use justify-content-md-center to center the columns on medium devices and up */}
+            <Row xs={1} md={2} lg={4} className="g-4 justify-content-center">
               {cvs.map((cv) => (
-                <Col key={cv._id}>
+                <Col key={cv._id} className="d-flex justify-content-center">
                   <Card>
                     <Card.Body className="d-flex flex-column align-items-center justify-content-center">
                       <Card.Title className="text-center mb-4">
