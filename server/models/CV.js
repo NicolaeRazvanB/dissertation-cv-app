@@ -62,6 +62,14 @@ const cvSchema = new mongoose.Schema(
         proficiency: { type: String },
       },
     ],
+    // New field for personal projects
+    personalProjects: [
+      {
+        name: { type: String, required: true }, // Mandatory name
+        description: { type: String, required: true }, // Mandatory description
+        projectLink: { type: String }, // Optional link to the project
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -116,7 +116,11 @@ const HomePage = () => {
                         {cv.cvName}
                       </Card.Title>
                       <div className="d-flex justify-content-center">
-                        <Button variant="secondary" className="me-2">
+                        <Button
+                          variant="secondary"
+                          className="me-2"
+                          onClick={() => navigate(`/cv/${cv._id}`)}
+                        >
                           View
                         </Button>
                         <Button variant="info" className="me-2">

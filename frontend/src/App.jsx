@@ -8,6 +8,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import EditProfile from "./pages/EditProfile.jsx";
 import DeployedCVS from "./pages/DeployedCVS.jsx";
 import AddCV from "./pages/AddCV.jsx";
+import CV from "./pages/CV.jsx";
 
 function App() {
   const { userInfo } = useContext(AuthContext);
@@ -34,6 +35,7 @@ function App() {
           element={userInfo ? <DeployedCVS /> : <Login />}
         />
         <Route path="/addCV" element={userInfo ? <AddCV /> : <Login />} />
+        <Route path="/cv/:cvId" element={userInfo ? <CV /> : <Login />} />
       </Routes>
     </>
   );
