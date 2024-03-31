@@ -5,6 +5,9 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import "bootstrap/dist/css/bootstrap.min.css";
+import EditProfile from "./pages/EditProfile.jsx";
+import DeployedCVS from "./pages/DeployedCVS.jsx";
+import AddCV from "./pages/AddCV.jsx";
 
 function App() {
   const { userInfo } = useContext(AuthContext);
@@ -22,6 +25,15 @@ function App() {
           element={userInfo ? <Navigate to="/" /> : <Register />}
         />
         <Route path="/register" element={<Register />} />
+        <Route
+          path="/editProfile"
+          element={userInfo ? <EditProfile /> : <Login />}
+        />
+        <Route
+          path="/portfolios"
+          element={userInfo ? <DeployedCVS /> : <Login />}
+        />
+        <Route path="/addCV" element={userInfo ? <AddCV /> : <Login />} />
       </Routes>
     </>
   );
