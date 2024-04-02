@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import NavbarComponent from "../components/NavbarComponent";
 import PersonalInfoForm from "../components/PersonalInfoForm"; // Ensure correct path
+import CVNameForm from "../components/CVNameForm"; // Adjust the import path as necessary
+import AboutForm from "../components/AboutForm"; // Adjust the import path as necessary
 
 const AddCV = () => {
-  const [CV, setCV] = useState({});
+  // Separate state for each section of the CV
+  const [cvName, setCvName] = useState("");
+  const [about, setAbout] = useState("");
   const [personalInfo, setPersonalInfo] = useState({
     firstName: "",
     lastName: "",
@@ -12,16 +16,20 @@ const AddCV = () => {
     address: "",
     linkedIn: "",
   });
+
+  // Log the entire CV state for debugging
   useEffect(() => {
-    CV.personalInfo = { personalInfo };
+    const CV = { cvName, about, personalInfo };
     console.log(CV);
-  }, [personalInfo]);
+  }, [cvName, about, personalInfo]);
 
   return (
     <>
       <NavbarComponent />
       <div className="container mt-4">
-        <h2>Personal information</h2>
+        <h2>CV Information</h2>
+        <CVNameForm cvName={cvName} setCvName={setCvName} />
+        <AboutForm about={about} setAbout={setAbout} />
         <PersonalInfoForm
           personalInfo={personalInfo}
           setPersonalInfo={setPersonalInfo}
