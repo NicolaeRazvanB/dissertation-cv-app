@@ -27,6 +27,7 @@ const AddCV = () => {
     "Certifications",
     "Languages",
   ];
+  const [imageFile, setImageFile] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [error, setError] = useState("");
   const [cvName, setCvName] = useState("");
@@ -92,8 +93,10 @@ const AddCV = () => {
       certifications,
       languages,
     };
+    cvData.photoName = "";
     console.log("Saving CV:", cvData);
     const token = userInfo.token;
+    let cvId;
     try {
       let requestParams = {
         ...requestOptions,
@@ -109,13 +112,67 @@ const AddCV = () => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+      let responseData = await response.json();
+      cvId = responseData._id;
+    } catch (error) {
+      // Set the error state to display the error message
+      setError("Failed to save CV. Please try again.");
+    }
+    const formData = new FormData();
+    let imageName = "";
+    if (imageFile) {
+      formData.append("photo", imageFile);
+      try {
+        let requestParams = {
+          method: "POST",
+          body: formData,
+        };
+        const response = await fetch(
+          `${base_url}api/uploadPhoto/${cvId}`,
+          requestParams
+        ); // Adjust the URL path as needed
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // If the POST request is successful, you can handle success (e.g., navigate, show message)
+        let imageRespData = await response.json();
+        imageName = imageRespData.fileName;
+        console.log("Image Upload successful");
+        cvData.photoName = imageName;
+      } catch (error) {
+        console.error(
+          "Failed to upload CV and photo. Please try again.",
+          error
+        );
+        setError("Failed to upload CV and photo. Please try again.");
+      }
+    }
+
+    try {
+      let requestParams = {
+        ...requestOptions,
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(cvData),
+      };
+      console.log("cv e gata");
+      console.log(cvData);
+      const response = await fetch(base_url + "api/cv/" + cvId, requestParams);
+      console.log(await response.json());
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       // If the POST request is successful, navigate to /home
       navigate("/");
     } catch (error) {
       // Set the error state to display the error message
       setError("Failed to save CV. Please try again.");
-      window.scrollTo(0, 0);
     }
   };
 
@@ -152,8 +209,13 @@ const AddCV = () => {
         </div>
         {/* Conditional rendering based on currentStep */}
         {currentStep === 1 && (
-          <CVNameForm cvName={cvName} setCvName={setCvName} />
+          <CVNameForm
+            cvName={cvName}
+            setCvName={setCvName}
+            setImageFile={setImageFile} // Passing setImageFile down as a prop
+          />
         )}
+
         {currentStep === 2 && <AboutForm about={about} setAbout={setAbout} />}
         {currentStep === 3 && (
           <PersonalInfoForm
