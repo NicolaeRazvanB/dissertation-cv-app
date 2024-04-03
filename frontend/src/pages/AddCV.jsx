@@ -78,7 +78,7 @@ const AddCV = () => {
   };
 
   const isLastStep = () => {
-    return currentStep === 8; // Assuming there are 8 steps in total
+    return currentStep === 9;
   };
 
   const handleSaveCV = async () => {
