@@ -12,9 +12,9 @@ const cvSchema = new mongoose.Schema(
       required: true,
     },
     personalInfo: {
-      firstName: { type: String, required: true },
-      lastName: { type: String, required: true },
-      email: { type: String, required: true },
+      firstName: { type: String },
+      lastName: { type: String },
+      email: { type: String },
       phoneNumber: { type: String },
       address: { type: String },
       linkedIn: { type: String },
@@ -24,17 +24,17 @@ const cvSchema = new mongoose.Schema(
     },
     education: [
       {
-        schoolName: { type: String, required: true },
-        degree: { type: String, required: true },
-        fieldOfStudy: { type: String, required: true },
+        schoolName: { type: String },
+        degree: { type: String },
+        fieldOfStudy: { type: String },
         startDate: { type: Date },
         endDate: { type: Date },
       },
     ],
     technicalExperience: [
       {
-        companyName: { type: String, required: true },
-        position: { type: String, required: true },
+        companyName: { type: String },
+        position: { type: String },
         startDate: { type: Date },
         endDate: { type: Date },
         description: { type: String },
@@ -42,32 +42,32 @@ const cvSchema = new mongoose.Schema(
     ],
     certifications: [
       {
-        name: { type: String, required: true },
-        dateObtained: { type: Date, required: true },
+        name: { type: String },
+        dateObtained: { type: Date },
       },
     ],
     languages: [
       {
-        languageName: { type: String, required: true },
+        languageName: { type: String },
         grade: {
           type: String,
-          required: true,
-          enum: ["A1", "A2", "B1", "B2", "C1", "C2"],
+
+          enum: ["", "A1", "A2", "B1", "B2", "C1", "C2"],
         },
       },
     ],
     skills: [
       {
-        skillName: { type: String, required: true },
+        skillName: { type: String },
         proficiency: { type: String },
       },
     ],
-    // New field for personal projects
+
     personalProjects: [
       {
-        name: { type: String, required: true }, // Mandatory name
-        description: { type: String, required: true }, // Mandatory description
-        projectLink: { type: String }, // Optional link to the project
+        name: { type: String },
+        description: { type: String },
+        projectLink: { type: String },
       },
     ],
   },
