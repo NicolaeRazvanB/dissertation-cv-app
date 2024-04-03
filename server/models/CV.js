@@ -11,6 +11,9 @@ const cvSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    photoName: {
+      type: String,
+    },
     personalInfo: {
       firstName: { type: String },
       lastName: { type: String },
