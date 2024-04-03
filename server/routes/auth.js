@@ -90,11 +90,23 @@ router.get("/user", verifyToken, async (req, res, next) => {
 //UPDATE USER
 router.put("/user", verifyToken, async (req, res, next) => {
   try {
+    // Check if password change is requested
+    if (req.body.password) {
+      const salt = await bcrypt.genSalt(10);
+      const cryptedPassword = await bcrypt.hash(req.body.password, salt);
+
+      // Update the password in the request body to be the hashed version
+      req.body.password = cryptedPassword;
+    }
+
+    // Update user with potentially new hashed password and other details
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
       { $set: req.body },
       { new: true }
     );
+
+    // Remove the password before sending the user details back
     const { password, ...userDetails } = updatedUser.toObject();
     res.json(userDetails);
   } catch (error) {
