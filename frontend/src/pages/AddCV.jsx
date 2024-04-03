@@ -5,6 +5,10 @@ import CVNameForm from "../components/CVNameForm";
 import AboutForm from "../components/AboutForm";
 import EducationForm from "../components/EducationForm";
 import TechnicalExperienceForm from "../components/TechnicalExperienceForm";
+import PersonalProjectsForm from "../components/PersonalProjectsForm";
+import CertificationsForm from "../components/CertificationsForm";
+import LanguagesForm from "../components/LanguagesForm";
+import SkillsForm from "../components/SkillsForm"; // Adjust the import path as necessary
 import { Form } from "react-bootstrap";
 const AddCV = () => {
   const [cvName, setCvName] = useState("");
@@ -35,7 +39,14 @@ const AddCV = () => {
       endDate: "",
     },
   ]);
-
+  const [personalProjects, setPersonalProjects] = useState([
+    { name: "", description: "", projectLink: "" },
+  ]);
+  const [certifications, setCertifications] = useState([
+    { name: "", dateObtained: "" },
+  ]);
+  const [languages, setLanguages] = useState([{ languageName: "", grade: "" }]);
+  const [skills, setSkills] = useState([{ skillName: "", proficiency: "" }]);
   useEffect(() => {
     console.log({
       cvName,
@@ -43,8 +54,22 @@ const AddCV = () => {
       personalInfo,
       education,
       technicalExperience,
+      personalProjects,
+      certifications,
+      languages,
+      skills,
     });
-  }, [cvName, about, personalInfo, education, technicalExperience]);
+  }, [
+    cvName,
+    about,
+    personalInfo,
+    education,
+    technicalExperience,
+    personalProjects,
+    certifications,
+    languages,
+    skills,
+  ]);
 
   return (
     <>
@@ -66,6 +91,16 @@ const AddCV = () => {
           technicalExperience={technicalExperience}
           setTechnicalExperience={setTechnicalExperience}
         />
+        <PersonalProjectsForm
+          personalProjects={personalProjects}
+          setPersonalProjects={setPersonalProjects}
+        />
+        <SkillsForm skills={skills} setSkills={setSkills} />
+        <CertificationsForm
+          certifications={certifications}
+          setCertifications={setCertifications}
+        />
+        <LanguagesForm languages={languages} setLanguages={setLanguages} />
       </div>
     </>
   );
