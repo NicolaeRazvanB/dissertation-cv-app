@@ -17,6 +17,7 @@ const CV = () => {
   const cvRef = useRef();
   const doc = useRef();
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchCvData = async () => {
       try {
@@ -88,6 +89,13 @@ const CV = () => {
           </button>{" "}
           <Button variant="danger" onClick={() => handleDeleteCV(cvId)}>
             Delete
+          </Button>{" "}
+          <Button
+            variant="info"
+            className="me-2"
+            onClick={() => navigate(`/editCV/${cvId}`)}
+          >
+            Edit
           </Button>
           {cvData ? (
             <PDFExport
