@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import NavbarComponent from "../components/NavbarComponent";
 import PersonalInfoForm from "../components/PersonalInfoForm";
 import CVNameForm from "../components/CVNameForm";
@@ -8,14 +8,25 @@ import TechnicalExperienceForm from "../components/TechnicalExperienceForm";
 import PersonalProjectsForm from "../components/PersonalProjectsForm";
 import CertificationsForm from "../components/CertificationsForm";
 import LanguagesForm from "../components/LanguagesForm";
-import SkillsForm from "../components/SkillsForm"; // Adjust the import path as necessary
-import { Form, Button, Alert, ProgressBar } from "react-bootstrap";
+import SkillsForm from "../components/SkillsForm";
+import { Button, Alert, ProgressBar } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import { requestOptions, base_url } from "../requestOptions";
 const AddCV = () => {
   const { userInfo, dispatch } = useContext(AuthContext);
   const navigate = useNavigate();
+  const stepNames = [
+    "CV Name",
+    "About",
+    "Personal Info",
+    "Education",
+    "Tech Experience",
+    "Projects",
+    "Skills",
+    "Certifications",
+    "Languages",
+  ];
   const [currentStep, setCurrentStep] = useState(1);
   const [error, setError] = useState("");
   const [cvName, setCvName] = useState("");
@@ -113,10 +124,32 @@ const AddCV = () => {
       <NavbarComponent />
       <div className="container mt-4">
         {error && <Alert variant="danger">{error}</Alert>}
-        <ProgressBar
-          now={(currentStep / 9) * 100}
-          label={`${Math.round((currentStep / 9) * 100)}%`}
-        />
+        <div className="d-flex align-items-center justify-content-center mt-3 mb-3">
+          {stepNames.map((name, index) => (
+            <div key={index} className="d-flex align-items-center">
+              <div
+                style={{
+                  height: "20px",
+                  width: "20px",
+                  borderRadius: "50%",
+                  backgroundColor:
+                    currentStep === index + 1 ? "#007bff" : "#e9ecef",
+                  color: currentStep === index + 1 ? "white" : "black",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "12px",
+                }}
+              >
+                {index + 1}
+              </div>
+              {index < stepNames.length - 1 && (
+                <hr style={{ width: "20px", margin: "0 10px" }} />
+              )}
+            </div>
+          ))}
+          <span className="ms-2">{stepNames[currentStep - 1]}</span>
+        </div>
         {/* Conditional rendering based on currentStep */}
         {currentStep === 1 && (
           <CVNameForm cvName={cvName} setCvName={setCvName} />

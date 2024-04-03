@@ -9,6 +9,7 @@ import EditProfile from "./pages/EditProfile.jsx";
 import DeployedCVS from "./pages/DeployedCVS.jsx";
 import AddCV from "./pages/AddCV.jsx";
 import CV from "./pages/CV.jsx";
+import EditCV from "./pages/EditCV.jsx";
 
 function App() {
   const { userInfo } = useContext(AuthContext);
@@ -36,6 +37,10 @@ function App() {
         />
         <Route path="/addCV" element={userInfo ? <AddCV /> : <Login />} />
         <Route path="/cv/:cvId" element={userInfo ? <CV /> : <Login />} />
+        <Route
+          path="/editCV/:cvId"
+          element={userInfo ? <EditCV /> : <Login />}
+        />
       </Routes>
     </>
   );
