@@ -2,16 +2,16 @@ import React, { useContext, useState, useEffect } from "react";
 import NavbarComponent from "../components/NavbarComponent";
 import { AuthContext } from "../context/AuthContext";
 import { requestOptions, base_url } from "../requestOptions";
-import { useParams } from "react-router-dom";
-import { Spinner, Button } from "react-bootstrap"; // Import Spinner from react-bootstrap
+import { useParams, useNavigate } from "react-router-dom";
+import { Spinner, Button, Alert } from "react-bootstrap";
 import { useRef } from "react";
 import { PDFExport } from "@progress/kendo-react-pdf";
-import { useNavigate } from "react-router-dom";
 
 const CV = () => {
   const { userInfo } = useContext(AuthContext);
-  const { cvId } = useParams(); // Get the cvId from URL parameters
-  const [cvData, setCvData] = useState(null); // State to hold CV data
+  const { cvId } = useParams();
+  const [cvData, setCvData] = useState(null);
+  const [cvPhotoUrl, setCvPhotoUrl] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const cvRef = useRef();
@@ -20,13 +20,14 @@ const CV = () => {
 
   useEffect(() => {
     const fetchCvData = async () => {
+      setLoading(true);
       try {
-        const token = userInfo.token; // Extract token from userInfo
+        const token = userInfo.token;
         const requestParams = {
           ...requestOptions,
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Include bearer token in headers
+            Authorization: `Bearer ${token}`,
           },
         };
         const response = await fetch(
@@ -35,12 +36,27 @@ const CV = () => {
         );
         if (!response.ok) throw new Error("Failed to fetch CV data");
         const data = await response.json();
-        setCvData(data); // Set the fetched data into state
+        setCvData(data);
+        if (data.photoName && data.photoName !== "") {
+          const photoResponse = await fetch(
+            `${base_url}api/image/${data.photoName}`,
+            requestOptions
+          );
+          if (photoResponse.ok) {
+            const blob = await photoResponse.blob();
+            const photoUrl = URL.createObjectURL(blob);
+            setCvPhotoUrl(photoUrl);
+          } else {
+            console.error("Failed to fetch CV photo");
+          }
+        }
       } catch (error) {
         console.error("Error fetching CV data:", error);
+        setError("Error fetching CV data. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
-
     fetchCvData();
   }, [cvId, userInfo.token]);
 
@@ -49,6 +65,7 @@ const CV = () => {
       doc.current.save();
     }
   };
+
   const handleDeleteCV = async (cvId) => {
     try {
       const token = userInfo.token;
@@ -60,17 +77,14 @@ const CV = () => {
         },
       };
       const response = await fetch(`${base_url}api/cv/${cvId}`, requestParams);
-
-      if (!response.ok) {
-        throw new Error("Failed to delete CV");
-      }
-
+      if (!response.ok) throw new Error("Failed to delete CV");
       navigate("/");
     } catch (error) {
       console.error(error);
       setError("Error deleting CV. Please try again.");
     }
   };
+
   return (
     <>
       <NavbarComponent />
@@ -86,10 +100,10 @@ const CV = () => {
             onClick={downloadPdfDocument}
           >
             Download as PDF
-          </button>{" "}
+          </button>
           <Button variant="danger" onClick={() => handleDeleteCV(cvId)}>
             Delete
-          </Button>{" "}
+          </Button>
           <Button
             variant="info"
             className="me-2"
@@ -106,10 +120,27 @@ const CV = () => {
               ref={doc}
             >
               <div ref={cvRef}>
-                {/* CV Name */}
                 <h1 className="text-center">{cvData.cvName}</h1>
-
-                {/* Personal Information Section */}
+                {cvPhotoUrl && (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    <img
+                      src={cvPhotoUrl}
+                      alt="CV Photo"
+                      style={{
+                        width: 250,
+                        height: 250,
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                      }}
+                    />
+                  </div>
+                )}
                 {cvData.personalInfo && (
                   <div className="mb-4">
                     <h2>Personal Information</h2>
@@ -139,16 +170,12 @@ const CV = () => {
                     </p>
                   </div>
                 )}
-
-                {/* About Section */}
                 {cvData.about && (
                   <div className="mb-4">
                     <h2>About</h2>
                     <p>{cvData.about}</p>
                   </div>
                 )}
-
-                {/* Education Section */}
                 {cvData.education && cvData.education.length > 0 && (
                   <div className="mb-4">
                     <h2>Education</h2>
@@ -177,8 +204,6 @@ const CV = () => {
                     ))}
                   </div>
                 )}
-
-                {/* Technical Experience Section */}
                 {cvData.technicalExperience &&
                   cvData.technicalExperience.length > 0 && (
                     <div className="mb-4">
@@ -208,8 +233,6 @@ const CV = () => {
                       ))}
                     </div>
                   )}
-
-                {/* Personal Projects Section */}
                 {cvData.personalProjects &&
                   cvData.personalProjects.length > 0 && (
                     <div className="mb-4">
@@ -238,8 +261,6 @@ const CV = () => {
                       ))}
                     </div>
                   )}
-
-                {/* Certifications Section */}
                 {cvData.certifications && cvData.certifications.length > 0 && (
                   <div className="mb-4">
                     <h2>Certifications</h2>
@@ -258,8 +279,6 @@ const CV = () => {
                     ))}
                   </div>
                 )}
-
-                {/* Languages Section */}
                 {cvData.languages && cvData.languages.length > 0 && (
                   <div className="mb-4">
                     <h2>Languages</h2>
@@ -273,8 +292,6 @@ const CV = () => {
                     ))}
                   </div>
                 )}
-
-                {/* Skills Section */}
                 {cvData.skills && cvData.skills.length > 0 && (
                   <div className="mb-4">
                     <h2>Skills</h2>

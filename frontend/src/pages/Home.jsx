@@ -24,7 +24,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(false);
 
   const fetchPhotoUrl = async (cv) => {
-    if (cv.photoName) {
+    if (cv.photoName !== "") {
       try {
         const response = await fetch(`${base_url}api/image/${cv.photoName}`, {
           ...requestOptions,
