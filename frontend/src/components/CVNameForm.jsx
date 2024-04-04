@@ -1,8 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { Form } from "react-bootstrap";
-
-const CVNameForm = ({ cvName, setCvName, setImageFile }) => {
+import { base_url, requestOptions } from "../requestOptions";
+const CVNameForm = ({ cvName, setCvName, setImageFile, currentImage }) => {
   const [preview, setPreview] = useState("");
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        if (currentImage) {
+          const response = await fetch(
+            `${base_url}api/image/${currentImage}`,
+            requestOptions
+          );
+          if (response.ok) {
+            const imageData = await response.blob();
+            setPreview(URL.createObjectURL(imageData));
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch image:", error);
+      }
+    };
+
+    fetchImage();
+
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [currentImage]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -14,11 +41,6 @@ const CVNameForm = ({ cvName, setCvName, setImageFile }) => {
       setPreview("");
     }
   };
-
-  useEffect(() => {
-    // Clean up the preview URL to avoid memory leaks
-    return () => preview && URL.revokeObjectURL(preview);
-  }, [preview]);
 
   return (
     <>
@@ -33,6 +55,18 @@ const CVNameForm = ({ cvName, setCvName, setImageFile }) => {
           required
         />
       </Form.Group>
+      {/* {currentImage && (
+        <div className="mb-3">
+          <Form.Label>Current Photo</Form.Label>
+          <div>
+            <img
+              src={preview}
+              alt="Current Preview"
+              style={{ width: "100px", height: "auto" }}
+            />
+          </div>
+        </div>
+      )} */}
       <Form.Group className="mb-3">
         <Form.Label>Upload Photo</Form.Label>
         <Form.Control

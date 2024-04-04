@@ -9,18 +9,21 @@ import PersonalProjectsForm from "../components/PersonalProjectsForm";
 import CertificationsForm from "../components/CertificationsForm";
 import LanguagesForm from "../components/LanguagesForm";
 import SkillsForm from "../components/SkillsForm";
-import { Spinner, Button, Alert, ProgressBar } from "react-bootstrap";
+import { Spinner, Button, Alert } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { requestOptions, base_url } from "../requestOptions";
 import { useParams } from "react-router-dom";
+
 const EditCV = () => {
   const { cvId } = useParams();
   const { userInfo } = useContext(AuthContext);
   const [cvData, setCvData] = useState(null);
   const [cvDataUpdated, setCvDataUpdated] = useState(null);
   const [error, setError] = useState("");
+  const [imageFile, setImageFile] = useState(null);
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchCVData = async () => {
       try {
@@ -46,17 +49,38 @@ const EditCV = () => {
     fetchCVData();
   }, [cvId, userInfo.token]);
 
-  if (!cvData) {
-    return (
-      <div className="d-flex justify-content-center">
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
-      </div>
-    );
-  }
-
   const handleSaveCV = async () => {
+    const formData = new FormData();
+    let imageName = "";
+    if (imageFile) {
+      formData.append("photo", imageFile);
+      try {
+        let requestParams = {
+          method: "POST",
+          body: formData,
+        };
+        const response = await fetch(
+          `${base_url}api/uploadPhoto/${cvId}`,
+          requestParams
+        ); // Adjust the URL path as needed
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // If the POST request is successful, you can handle success (e.g., navigate, show message)
+        let imageRespData = await response.json();
+        imageName = imageRespData.fileName;
+        console.log("Image Upload successful");
+        cvDataUpdated.photoName = imageName;
+      } catch (error) {
+        console.error(
+          "Failed to upload CV and photo. Please try again.",
+          error
+        );
+        setError("Failed to upload CV and photo. Please try again.");
+      }
+    }
     try {
       let requestParams = {
         ...requestOptions,
@@ -81,18 +105,32 @@ const EditCV = () => {
     }
   };
 
+  // Render loading spinner if cvData or cvDataUpdated is null
+  if (!cvData || !cvDataUpdated) {
+    return (
+      <div className="d-flex justify-content-center">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </div>
+    );
+  }
+
   return (
     <>
       <NavbarComponent />
       <div className="container mt-4">
         {error && <Alert variant="danger">{error}</Alert>}
-        {/* Assuming cvData has been initially copied into cvDataUpdated when data was fetched */}
-        <CVNameForm
-          cvName={cvDataUpdated.cvName}
-          setCvName={(value) =>
-            setCvDataUpdated({ ...cvDataUpdated, cvName: value })
-          }
-        />
+        {cvDataUpdated && ( // Check if cvDataUpdated is not null before rendering CVNameForm
+          <CVNameForm
+            cvName={cvDataUpdated.cvName}
+            setCvName={(value) =>
+              setCvDataUpdated({ ...cvDataUpdated, cvName: value })
+            }
+            setImageFile={setImageFile} // Pass setImageFile as a prop
+            currentImage={cvData.photoName} // Pass the current image name
+          />
+        )}
         <AboutForm
           about={cvDataUpdated.about}
           setAbout={(value) =>
