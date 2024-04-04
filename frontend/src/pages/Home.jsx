@@ -13,6 +13,7 @@ import { Plus, Globe, Pencil } from "react-bootstrap-icons";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import NavbarComponent from "../components/NavbarComponent";
+import SidebarButtons from "../components/SidebarButtons";
 import { requestOptions, base_url } from "../requestOptions";
 import noPhoto from "../../public/noPhoto.webp";
 
@@ -114,30 +115,9 @@ const HomePage = () => {
           <Container fluid>
             <Row>
               <Col xs={2} className="bg-light p-3 sidebar">
-                <Nav className="flex-column">
-                  <Button
-                    variant="light"
-                    onClick={handleAddCV}
-                    className="text-decoration-none text-dark w-100 mb-2"
-                  >
-                    <Plus /> Add CV
-                  </Button>
-                  <Button
-                    variant="light"
-                    onClick={handleViewWebsites}
-                    className="text-decoration-none text-dark w-100 mb-2"
-                  >
-                    <Globe /> Portfolios
-                  </Button>
-                  <Button
-                    variant="light"
-                    onClick={handleEditProfile}
-                    className="text-decoration-none text-dark w-100"
-                  >
-                    <Pencil /> Edit Profile
-                  </Button>
-                </Nav>
+                <SidebarButtons />
               </Col>
+
               <Col>
                 <div className="d-flex justify-content-center">
                   <h2>My CVs</h2>
