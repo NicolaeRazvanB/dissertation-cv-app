@@ -150,7 +150,7 @@ const HomePage = () => {
                 >
                   {cvs.map((cv) => (
                     <Col key={cv._id} className="d-flex justify-content-center">
-                      <Card>
+                      <Card onClick={() => navigate(`/cv/${cv._id}`)}>
                         <Card.Img
                           variant="top"
                           src={cv.photoUrl || noPhoto}
@@ -169,20 +169,29 @@ const HomePage = () => {
                             <Button
                               variant="secondary"
                               className="me-2"
-                              onClick={() => navigate(`/cv/${cv._id}`)}
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent event from bubbling up to the parent
+                                navigate(`/deployCV/${cv._id}`);
+                              }}
                             >
-                              View
+                              Launch Portfolio
                             </Button>
                             <Button
                               variant="info"
                               className="me-2"
-                              onClick={() => navigate(`/editCV/${cv._id}`)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/editCV/${cv._id}`);
+                              }}
                             >
                               Edit
                             </Button>
                             <Button
                               variant="danger"
-                              onClick={() => handleDeleteCV(cv._id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteCV(cv._id);
+                              }}
                             >
                               Delete
                             </Button>
