@@ -5,7 +5,7 @@ import { AuthContext } from "../context/AuthContext";
 import NavbarComponent from "../components/NavbarComponent";
 import { Spinner, Card, Button, Form, FormControl } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-
+import QRCode from "qrcode";
 const DeployCV = () => {
   const { userInfo } = useContext(AuthContext);
   const { cvId } = useParams();
@@ -52,7 +52,41 @@ const DeployCV = () => {
 
   const handleSelectTheme = async (selectedTheme) => {
     setTheme(selectedTheme);
+
     try {
+      // Generate QR code image
+      const qrUrl = `http://localhost:5173/portfolios/${siteName}`;
+      const qrCodeDataUrl = await QRCode.toDataURL(qrUrl);
+
+      // Create a Blob from the Data URL
+      const qrCodeBlob = await (await fetch(qrCodeDataUrl)).blob();
+      const qrCodeFile = new File([qrCodeBlob], `${cvId}_${siteName}.png`, {
+        type: "image/png",
+      });
+
+      // Create FormData and append the file
+      const formData = new FormData();
+      formData.append("qrCode", qrCodeFile);
+      formData.append("cvId", cvId);
+      formData.append("siteName", siteName);
+
+      // Upload QR code image to the server
+      const uploadResponse = await fetch(`${base_url}api/uploadQR`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Failed to upload QR code");
+      }
+
+      const { fileName } = await uploadResponse.json();
+      const qrCodePath = `/uploads/qrs/${fileName}`;
+
+      // Deploy CV with the QR code path
       const deployParams = {
         method: "POST",
         headers: {
@@ -64,15 +98,19 @@ const DeployCV = () => {
           cvId: cvId,
           themeName: selectedTheme.name,
           siteName: siteName,
+          qrCodePath: qrCodePath,
         }),
       };
+
       const response = await fetch(
         `${base_url}api/deployedCV/deployed-cvs`,
         deployParams
       );
+
       if (!response.ok) {
         throw new Error("Failed to deploy CV");
       }
+
       navigate("/portfolios/" + siteName);
     } catch (error) {
       console.error("Error deploying CV:", error);

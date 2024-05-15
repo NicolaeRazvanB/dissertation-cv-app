@@ -1,10 +1,9 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import NavbarComponent from "../components/NavbarComponent";
 import { AuthContext } from "../context/AuthContext";
 import { requestOptions, base_url } from "../requestOptions";
 import { useParams, useNavigate } from "react-router-dom";
 import { Spinner, Button, Alert } from "react-bootstrap";
-import { useRef } from "react";
 import { PDFExport } from "@progress/kendo-react-pdf";
 
 const CV = () => {
@@ -12,6 +11,7 @@ const CV = () => {
   const { cvId } = useParams();
   const [cvData, setCvData] = useState(null);
   const [cvPhotoUrl, setCvPhotoUrl] = useState("");
+  const [qrCodeUrl, setQrCodeUrl] = useState(""); // State for QR code URL
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const cvRef = useRef();
@@ -37,6 +37,7 @@ const CV = () => {
         if (!response.ok) throw new Error("Failed to fetch CV data");
         const data = await response.json();
         setCvData(data);
+
         if (data.photoName && data.photoName !== "") {
           const photoResponse = await fetch(
             `${base_url}api/image/${data.photoName}`,
@@ -49,6 +50,19 @@ const CV = () => {
           } else {
             console.error("Failed to fetch CV photo");
           }
+        }
+
+        // Fetch QR code URL
+        const qrCodeResponse = await fetch(
+          `${base_url}api/qr/${cvId}`,
+          requestOptions
+        );
+        if (qrCodeResponse.ok) {
+          const qrCodeBlob = await qrCodeResponse.blob();
+          const qrCodeUrl = URL.createObjectURL(qrCodeBlob);
+          setQrCodeUrl(qrCodeUrl);
+        } else {
+          console.error("Failed to fetch QR code");
         }
       } catch (error) {
         console.error("Error fetching CV data:", error);
@@ -133,14 +147,15 @@ const CV = () => {
                       src={cvPhotoUrl}
                       alt="CV Photo"
                       style={{
-                        width: 250,
-                        height: 250,
+                        width: "250px",
+                        height: "250px",
                         objectFit: "cover",
                         borderRadius: "8px",
                       }}
                     />
                   </div>
                 )}
+
                 {cvData.personalInfo && (
                   <div className="mb-4">
                     <h2>Personal Information</h2>
@@ -304,6 +319,21 @@ const CV = () => {
                         </div>
                       ))}
                     </div>
+                  </div>
+                )}
+                {qrCodeUrl && (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    <img
+                      src={qrCodeUrl}
+                      alt="QR Code"
+                      style={{ width: 150, height: 150 }}
+                    />
                   </div>
                 )}
               </div>

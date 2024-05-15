@@ -1,3 +1,6 @@
+const path = require("path");
+const fs = require("fs");
+
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -10,8 +13,6 @@ const deployedCVRoute = require("./routes/deployedCV");
 const logger = require("morgan");
 dotenv.config();
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
 const util = require("util");
 const unlink = util.promisify(fs.unlink);
 const readdir = util.promisify(fs.readdir);
@@ -83,6 +84,58 @@ app.post("/api/uploadPhoto/:cvId", async (req, res, next) => {
   });
 });
 
+// Route to handle QR code uploads
+app.post("/api/uploadQR", async (req, res, next) => {
+  const { cvId, siteName } = req.body;
+
+  // Find and delete existing QR code for the same cvId and siteName
+  try {
+    const files = await readdir(path.resolve("uploads/qrs"));
+    const existingFile = files.find((file) =>
+      file.startsWith(`${cvId}_${siteName}`)
+    );
+    if (existingFile) {
+      const fullPath = path.resolve("uploads/qrs", existingFile);
+      await unlink(fullPath);
+      console.log(`Deleted existing QR file: ${fullPath}`);
+    }
+  } catch (error) {
+    console.error(`Error deleting QR file: ${error}`);
+    return res.status(500).json({
+      message: "Error deleting existing QR file",
+      error: error.toString(),
+    });
+  }
+
+  function configureQRMulter() {
+    const storage = multer.diskStorage({
+      destination: "uploads/qrs/", // Directory for QR code uploads
+      filename: function (req, file, cb) {
+        const timestamp = Date.now();
+        const filename = `${file.originalname}_${timestamp}${path.extname(
+          file.originalname
+        )}`;
+        cb(null, filename);
+      },
+    });
+    return multer({ storage: storage });
+  }
+  // Multer configuration and file upload handling for QR codes
+  const upload = configureQRMulter().single("qrCode");
+  upload(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      return next(err);
+    } else if (err) {
+      return next(err);
+    }
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+    // File uploaded successfully
+    res.status(200).json({ fileName: req.file.filename });
+  });
+});
+
 // Route to fetch an image
 app.get("/api/image/:filename", (req, res) => {
   const filename = req.params.filename;
@@ -100,6 +153,24 @@ app.get("/api/image/:filename", (req, res) => {
     const readStream = fs.createReadStream(filePath);
     readStream.pipe(res);
   });
+});
+
+// Route to fetch a QR code
+app.get("/api/qr/:cvId", (req, res) => {
+  const { cvId } = req.params;
+  const qrFolderPath = path.resolve(__dirname, "uploads/qrs"); // Adjusted path
+  const qrFileName = fs
+    .readdirSync(qrFolderPath)
+    .find((file) => file.startsWith(`${cvId}_`));
+
+  if (!qrFileName) {
+    return res.status(404).json({ message: "QR code not found" });
+  }
+
+  const filePath = path.join(qrFolderPath, qrFileName);
+  res.setHeader("Content-Type", "image/png");
+  const readStream = fs.createReadStream(filePath);
+  readStream.pipe(res);
 });
 
 // Error Handling Middleware
