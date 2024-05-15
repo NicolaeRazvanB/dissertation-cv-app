@@ -9,7 +9,7 @@ import {
 } from "react-bootstrap";
 import NavbarComponent from "../components/NavbarComponent";
 
-const ClassicTheme = ({ cv }) => {
+const ClassicTheme = ({ cv, photoUrl }) => {
   if (!cv) {
     return <div className="text-center">Apologies, no CV found.</div>;
   }
@@ -20,6 +20,21 @@ const ClassicTheme = ({ cv }) => {
       <Container className="mt-5">
         <Row className="justify-content-center">
           <Col md={8}>
+            {photoUrl && (
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <Card.Img
+                  variant="top"
+                  src={photoUrl}
+                  alt="CV Photo"
+                  style={{
+                    width: "9vw",
+                    height: "9vw",
+                    borderRadius: "3px",
+                    marginBottom: "8px",
+                  }}
+                />
+              </div>
+            )}
             <Card className="mb-4">
               <Card.Body>
                 <Card.Title className="text-center mb-3">

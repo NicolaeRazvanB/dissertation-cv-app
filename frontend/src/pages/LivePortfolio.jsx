@@ -13,6 +13,7 @@ const LivePortfolio = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [cv, setCv] = useState(null);
+  const [photoUrl, setPhotoUrl] = useState(null); // State to store photo URL
   const { userInfo } = useContext(AuthContext);
 
   useEffect(() => {
@@ -59,6 +60,12 @@ const LivePortfolio = () => {
       }
       const data = await response.json();
       setCv(data);
+
+      // Fetch the photo URL if photoName is defined
+      if (data.photoName) {
+        const photoUrl = await fetchPhotoUrl(data.photoName);
+        setPhotoUrl(photoUrl);
+      }
     } catch (error) {
       console.error("Error fetching CV:", error);
       setError("Error fetching CVs. Please try again.");
@@ -67,11 +74,31 @@ const LivePortfolio = () => {
     }
   };
 
+  // Function to fetch photo URL
+  const fetchPhotoUrl = async (photoName) => {
+    try {
+      const response = await fetch(`${base_url}api/image/${photoName}`, {
+        ...requestOptions,
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch image");
+      }
+      const blob = await response.blob();
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      console.error("Error fetching image:", error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     if (portfolio) {
       fetchCVData();
     }
-  }, [portfolio]);
+  }, [portfolio, userInfo]); // Add userInfo as dependency
 
   if (loading) {
     return (
@@ -91,28 +118,15 @@ const LivePortfolio = () => {
     );
   }
 
-  if (portfolio && portfolio.themeName === "Modern" && cv) {
-    return <ModernTheme cv={cv} />;
-  } else if (portfolio && portfolio.themeName === "Classic" && cv) {
-    return <ClassicTheme cv={cv} />; // Render ClassicTheme component
+  if (portfolio && cv) {
+    if (portfolio.themeName === "Modern") {
+      return <ModernTheme cv={cv} photoUrl={photoUrl} />;
+    } else if (portfolio.themeName === "Classic") {
+      return <ClassicTheme cv={cv} photoUrl={photoUrl} />;
+    }
   }
 
-  return (
-    <div>
-      <NavbarComponent />
-      <div className="container mt-3">
-        <h1>Live Portfolio</h1>
-        {portfolio ? (
-          <div>
-            <h2>{portfolio.siteName}</h2>
-            <p>Theme: {portfolio.themeName}</p>
-          </div>
-        ) : (
-          <p>No portfolio found.</p>
-        )}
-      </div>
-    </div>
-  );
+  return null; // Add a return null statement for cases where no condition is met
 };
 
 export default LivePortfolio;
