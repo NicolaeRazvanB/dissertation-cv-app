@@ -1,0 +1,140 @@
+import React from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  ListGroup,
+  ListGroupItem,
+} from "react-bootstrap";
+import NavbarComponent from "../components/NavbarComponent";
+
+const ClassicTheme = ({ cv }) => {
+  if (!cv) {
+    return <div className="text-center">Apologies, no CV found.</div>;
+  }
+
+  return (
+    <div style={{ backgroundColor: "#f0f0f0", minHeight: "100vh" }}>
+      <NavbarComponent />
+      <Container className="mt-5">
+        <Row className="justify-content-center">
+          <Col md={8}>
+            <Card className="mb-4">
+              <Card.Body>
+                <Card.Title className="text-center mb-3">
+                  Welcome! My name is {cv.personalInfo.firstName}{" "}
+                  {cv.personalInfo.lastName}
+                </Card.Title>
+
+                <Card.Text>
+                  You may contact me via email at {cv.personalInfo.email} or
+                  reach me by phone at {cv.personalInfo.phoneNumber}.
+                </Card.Text>
+                <Card.Text>
+                  Feel free to connect with me on{" "}
+                  <a
+                    href={cv.personalInfo.linkedIn}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    LinkedIn
+                  </a>
+                  .
+                </Card.Text>
+              </Card.Body>
+            </Card>
+
+            <Card className="mb-4">
+              <Card.Body>
+                <Card.Title>Introduction</Card.Title>
+                <Card.Text>{cv.about}</Card.Text>
+              </Card.Body>
+            </Card>
+
+            <Card className="mb-4">
+              <Card.Body>
+                <Card.Title>Education</Card.Title>
+                <ListGroup variant="flush">
+                  {cv.education.map((edu, index) => (
+                    <ListGroupItem key={index}>
+                      {edu.degree} in {edu.fieldOfStudy} from {edu.schoolName} (
+                      {new Date(edu.startDate).getFullYear()} -{" "}
+                      {new Date(edu.endDate).getFullYear()})
+                    </ListGroupItem>
+                  ))}
+                </ListGroup>
+              </Card.Body>
+            </Card>
+
+            <Card className="mb-4">
+              <Card.Body>
+                <Card.Title>Professional Experience</Card.Title>
+                {cv.technicalExperience.map((exp, index) => (
+                  <Card key={index} className="mb-2">
+                    <Card.Body>
+                      <Card.Title>
+                        {exp.position} at {exp.companyName}
+                      </Card.Title>
+                      <Card.Subtitle className="mb-2 text-muted">
+                        {new Date(exp.startDate).toLocaleDateString()} -{" "}
+                        {new Date(exp.endDate).toLocaleDateString()}
+                      </Card.Subtitle>
+                      <Card.Text>{exp.description}</Card.Text>
+                    </Card.Body>
+                  </Card>
+                ))}
+              </Card.Body>
+            </Card>
+
+            <Card className="mb-4">
+              <Card.Body>
+                <Card.Title>Certifications</Card.Title>
+                <ListGroup variant="flush">
+                  {cv.certifications.map((cert, index) => (
+                    <ListGroupItem key={index}>
+                      {cert.name} (Issued:{" "}
+                      {new Date(cert.dateObtained).toLocaleDateString()})
+                    </ListGroupItem>
+                  ))}
+                </ListGroup>
+              </Card.Body>
+            </Card>
+
+            <Card className="mb-4">
+              <Card.Body>
+                <Card.Title>Skills & Proficiencies</Card.Title>
+                <ListGroup variant="flush">
+                  {cv.skills.map((skill, index) => (
+                    <ListGroupItem key={index}>
+                      {skill.skillName} - {skill.proficiency}
+                    </ListGroupItem>
+                  ))}
+                </ListGroup>
+              </Card.Body>
+            </Card>
+
+            <Card className="mb-4">
+              <Card.Body>
+                <Card.Title>Personal Projects</Card.Title>
+                {cv.personalProjects.map((project, index) => (
+                  <Card key={index} className="mb-2">
+                    <Card.Body>
+                      <Card.Title>{project.name}</Card.Title>
+                      <Card.Text>{project.description}</Card.Text>
+                      <Card.Link href={project.projectLink} target="_blank">
+                        View Project
+                      </Card.Link>
+                    </Card.Body>
+                  </Card>
+                ))}
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </div>
+  );
+};
+
+export default ClassicTheme;

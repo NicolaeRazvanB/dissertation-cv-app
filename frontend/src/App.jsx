@@ -11,7 +11,7 @@ import AddCV from "./pages/AddCV.jsx";
 import CV from "./pages/CV.jsx";
 import EditCV from "./pages/EditCV.jsx";
 import DeployCV from "./pages/DeployCV.jsx";
-
+import LivePortfolio from "./pages/LivePortfolio.jsx";
 function App() {
   const { userInfo } = useContext(AuthContext);
 
@@ -46,6 +46,7 @@ function App() {
           path="/deployCV/:cvId"
           element={userInfo ? <DeployCV /> : <Login />}
         />
+        <Route path="/portfolios/:siteName" element={<LivePortfolio />} />
       </Routes>
     </>
   );

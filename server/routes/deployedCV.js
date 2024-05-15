@@ -119,4 +119,23 @@ router.delete("/:id", verifyToken, async (req, res, next) => {
   }
 });
 
+//GET BY SITE NAME FROM PATH
+router.get("/deployed-cvs/by-name/:siteName", async (req, res, next) => {
+  try {
+    const { siteName } = req.params; // Now using path parameters
+    if (!siteName) {
+      return res.status(400).json({ message: "Site name is required." });
+    }
+
+    const deployedCV = await DeployedCV.findOne({ siteName: siteName });
+    if (!deployedCV) {
+      return res.status(404).json({ message: "Deployed CV not found." });
+    }
+
+    res.json(deployedCV);
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

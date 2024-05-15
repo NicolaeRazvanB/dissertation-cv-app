@@ -30,15 +30,12 @@ router.get("/my-cvs", verifyToken, async (req, res, next) => {
   }
 });
 
-//GET CV BY ID
-router.get("/:id", verifyToken, async (req, res, next) => {
+// GET CV BY ID
+router.get("/:id", async (req, res, next) => {
   try {
     const cv = await CV.findById(req.params.id);
     if (!cv) {
       return res.status(404).json({ message: "CV not found." });
-    }
-    if (cv.userId.toString() !== req.user.id) {
-      return res.status(403).json({ message: "Access denied." });
     }
     res.status(200).json(cv);
   } catch (error) {
