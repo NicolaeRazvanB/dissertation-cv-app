@@ -12,7 +12,7 @@ const CV = () => {
   const { cvId } = useParams();
   const [cvData, setCvData] = useState(null);
   const [cvPhotoUrl, setCvPhotoUrl] = useState("");
-  const [qrCodeUrl, setQrCodeUrl] = useState(""); // State for QR code URL
+  const [qrCodeUrl, setQrCodeUrl] = useState(null); // State for QR code URL
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const cvRef = useRef();
@@ -54,15 +54,19 @@ const CV = () => {
         }
 
         // Fetch QR code URL
-        const qrCodeResponse = await fetch(
-          `${base_url}api/qr/${cvId}`,
-          requestParams
-        );
-        if (qrCodeResponse.ok) {
-          const qrCodeBlob = await qrCodeResponse.blob();
-          const qrCodeUrl = URL.createObjectURL(qrCodeBlob);
-          setQrCodeUrl(qrCodeUrl);
-        } else {
+        try {
+          const qrCodeResponse = await fetch(
+            `${base_url}api/qr/${cvId}`,
+            requestParams
+          );
+          if (qrCodeResponse.ok) {
+            const qrCodeBlob = await qrCodeResponse.blob();
+            const qrCodeUrl = URL.createObjectURL(qrCodeBlob);
+            setQrCodeUrl(qrCodeUrl);
+          } else {
+            console.error("QR code not found for this CV");
+          }
+        } catch (error) {
           console.error("Failed to fetch QR code");
         }
       } catch (error) {
@@ -114,8 +118,10 @@ const CV = () => {
             <div
               style={{
                 display: "flex",
-                alignItems: "space-around",
+                flexDirection: "column",
+                alignItems: "flex-start",
                 justifyContent: "center",
+                marginRight: "20px",
               }}
             >
               <Button
@@ -124,12 +130,16 @@ const CV = () => {
               >
                 Download as PDF
               </Button>
-              <Button variant="danger" onClick={() => handleDeleteCV(cvId)}>
+              <Button
+                variant="danger"
+                className="mb-3"
+                onClick={() => handleDeleteCV(cvId)}
+              >
                 Delete
               </Button>
               <Button
                 variant="info"
-                className="me-2"
+                className="mb-3"
                 onClick={() => navigate(`/editCV/${cvId}`)}
               >
                 Edit
@@ -260,7 +270,9 @@ const CV = () => {
                               ? exp.startDate.substring(0, 10)
                               : "N/A"}{" "}
                             - <strong>End Date:</strong>{" "}
-                            {exp.endDate.substring(0, 10) || "Present"}
+                            {exp.endDate
+                              ? exp.endDate.substring(0, 10)
+                              : "Present"}
                           </p>
                         </div>
                       ))}
@@ -363,7 +375,6 @@ const CV = () => {
               </Spinner>
             </div>
           )}
-          {/* Integrate BusinessCardGenerator component */}
         </div>
       )}
     </>
