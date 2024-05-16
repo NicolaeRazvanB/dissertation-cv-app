@@ -5,6 +5,7 @@ import { requestOptions, base_url } from "../requestOptions";
 import { useParams, useNavigate } from "react-router-dom";
 import { Spinner, Button, Alert } from "react-bootstrap";
 import { PDFExport } from "@progress/kendo-react-pdf";
+import BusinessCardGenerator from "../components/BusinessCardGenerator";
 
 const CV = () => {
   const { userInfo } = useContext(AuthContext);
@@ -41,7 +42,7 @@ const CV = () => {
         if (data.photoName && data.photoName !== "") {
           const photoResponse = await fetch(
             `${base_url}api/image/${data.photoName}`,
-            requestOptions
+            requestParams
           );
           if (photoResponse.ok) {
             const blob = await photoResponse.blob();
@@ -55,7 +56,7 @@ const CV = () => {
         // Fetch QR code URL
         const qrCodeResponse = await fetch(
           `${base_url}api/qr/${cvId}`,
-          requestOptions
+          requestParams
         );
         if (qrCodeResponse.ok) {
           const qrCodeBlob = await qrCodeResponse.blob();
@@ -109,22 +110,41 @@ const CV = () => {
         </div>
       ) : (
         <div className="container mt-4">
-          <button
-            className="btn btn-primary mb-3"
-            onClick={downloadPdfDocument}
-          >
-            Download as PDF
-          </button>
-          <Button variant="danger" onClick={() => handleDeleteCV(cvId)}>
-            Delete
-          </Button>
-          <Button
-            variant="info"
-            className="me-2"
-            onClick={() => navigate(`/editCV/${cvId}`)}
-          >
-            Edit
-          </Button>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "space-around",
+                justifyContent: "center",
+              }}
+            >
+              <Button
+                className="btn btn-primary mb-3"
+                onClick={downloadPdfDocument}
+              >
+                Download as PDF
+              </Button>
+              <Button variant="danger" onClick={() => handleDeleteCV(cvId)}>
+                Delete
+              </Button>
+              <Button
+                variant="info"
+                className="me-2"
+                onClick={() => navigate(`/editCV/${cvId}`)}
+              >
+                Edit
+              </Button>
+            </div>
+
+            {cvData && (
+              <BusinessCardGenerator
+                cv={cvData}
+                cvPhotoUrl={cvPhotoUrl}
+                qrCodeUrl={qrCodeUrl}
+              />
+            )}
+          </div>
+
           {cvData ? (
             <PDFExport
               paperSize="A4"
@@ -240,9 +260,7 @@ const CV = () => {
                               ? exp.startDate.substring(0, 10)
                               : "N/A"}{" "}
                             - <strong>End Date:</strong>{" "}
-                            {exp.endDate
-                              ? exp.endDate.substring(0, 10)
-                              : "Present"}
+                            {exp.endDate.substring(0, 10) || "Present"}
                           </p>
                         </div>
                       ))}
@@ -345,6 +363,7 @@ const CV = () => {
               </Spinner>
             </div>
           )}
+          {/* Integrate BusinessCardGenerator component */}
         </div>
       )}
     </>
