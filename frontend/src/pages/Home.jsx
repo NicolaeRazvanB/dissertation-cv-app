@@ -172,7 +172,10 @@ const HomePage = () => {
                 >
                   {cvs.map((cv) => (
                     <Col key={cv._id} className="d-flex justify-content-center">
-                      <Card style={styles.card}>
+                      <Card
+                        onClick={() => navigate(`/cv/${cv._id}`)}
+                        style={styles.card}
+                      >
                         <Card.Img
                           variant="top"
                           src={cv.photoUrl || noPhoto}

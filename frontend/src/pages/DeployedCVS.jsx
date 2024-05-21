@@ -8,12 +8,14 @@ import {
   Button,
   Modal,
   Form,
+  Alert,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import NavbarComponent from "../components/NavbarComponent";
 import { AuthContext } from "../context/AuthContext";
 import { requestOptions, base_url } from "../requestOptions";
 import QRCode from "qrcode";
+import SidebarButtons from "../components/SidebarButtons";
 
 const DeployedCVS = () => {
   const [deployedCVS, setDeployedCVS] = useState([]);
@@ -186,95 +188,148 @@ const DeployedCVS = () => {
   return (
     <div>
       <NavbarComponent />
-      <Container className="mt-3">
-        <h1>Deployed CVs</h1>
-        {loading && (
-          <div className="text-center">
-            <Spinner animation="border" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-          </div>
-        )}
-        {error && (
-          <div className="alert alert-danger" role="alert">
-            {error}
-          </div>
-        )}
-        {!loading && !error && (
-          <Row>
-            {deployedCVS.map((cv) => (
-              <Col md={4} key={cv._id} className="mb-3">
-                <Card>
-                  <Card.Body>
-                    <Card.Title>
-                      <Link to={`/portfolios/${cv.siteName}`}>
-                        {cv.siteName}
-                      </Link>
-                    </Card.Title>
-                    <Card.Text>Theme: {cv.themeName}</Card.Text>
-                    <Card.Text>CV ID: {cv.cvId}</Card.Text>
-                    <Card.Text>
-                      Deployed at: {new Date(cv.createdAt).toLocaleDateString()}
-                    </Card.Text>
-                    <Button
-                      variant="primary"
-                      onClick={() => handleEdit(cv)}
-                      className="me-2"
-                    >
-                      Edit
-                    </Button>
-                    <Button variant="danger" onClick={() => handleDelete(cv)}>
-                      Delete
-                    </Button>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        )}
+      <Container fluid>
+        <div style={styles.background}>
+          <Container className="mt-3">
+            <h1 style={styles.heading}>Deployed CVs</h1>
+            {loading && (
+              <div className="text-center">
+                <Spinner animation="border" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </Spinner>
+              </div>
+            )}
+            {error && (
+              <Alert variant="danger" className="text-center">
+                {error}
+              </Alert>
+            )}
+            {!loading && !error && deployedCVS.length === 0 && (
+              <Alert variant="info" className="text-center">
+                No Portfolios found.
+              </Alert>
+            )}
+            {!loading && !error && deployedCVS.length > 0 && (
+              <Row>
+                {deployedCVS.map((cv) => (
+                  <Col md={4} key={cv._id} className="mb-3">
+                    <Card style={styles.card}>
+                      <Card.Body>
+                        <Card.Title>
+                          <Link
+                            to={`/portfolios/${cv.siteName}`}
+                            style={styles.cardLink}
+                          >
+                            {cv.siteName}
+                          </Link>
+                        </Card.Title>
+                        <Card.Text style={styles.cardText}>
+                          Theme: {cv.themeName}
+                        </Card.Text>
+                        <Card.Text style={styles.cardText}>
+                          Deployed at:{" "}
+                          {new Date(cv.createdAt).toLocaleDateString()}
+                        </Card.Text>
+                        <div className="d-flex justify-content-between">
+                          <Button
+                            variant="primary"
+                            onClick={() => handleEdit(cv)}
+                            className="me-2"
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="danger"
+                            onClick={() => handleDelete(cv)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            )}
 
-        {editCV && (
-          <Modal show={showModal} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Edit Deployed CV</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <Form>
-                <Form.Group className="mb-3" controlId="formSiteName">
-                  <Form.Label>Site Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="siteName"
-                    value={editCV.siteName}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formThemeName">
-                  <Form.Label>Theme Name</Form.Label>
-                  <Form.Select
-                    name="themeName"
-                    value={editCV.themeName}
-                    onChange={handleChange}
-                  >
-                    <option value="Modern">Modern</option>
-                    <option value="Classic">Classic</option>
-                  </Form.Select>
-                </Form.Group>
-              </Form>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Close
-              </Button>
-              <Button variant="primary" onClick={handleSave}>
-                Save Changes
-              </Button>
-            </Modal.Footer>
-          </Modal>
-        )}
+            {editCV && (
+              <Modal show={showModal} onHide={handleClose}>
+                <Modal.Header closeButton>
+                  <Modal.Title>Edit Deployed CV</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <Form>
+                    <Form.Group className="mb-3" controlId="formSiteName">
+                      <Form.Label>Site Name</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="siteName"
+                        value={editCV.siteName}
+                        onChange={handleChange}
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-3" controlId="formThemeName">
+                      <Form.Label>Theme Name</Form.Label>
+                      <Form.Select
+                        name="themeName"
+                        value={editCV.themeName}
+                        onChange={handleChange}
+                      >
+                        <option value="Modern">Modern</option>
+                        <option value="Classic">Classic</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onClick={handleClose}>
+                    Close
+                  </Button>
+                  <Button variant="primary" onClick={handleSave}>
+                    Save Changes
+                  </Button>
+                </Modal.Footer>
+              </Modal>
+            )}
+          </Container>
+        </div>
       </Container>
     </div>
   );
+};
+
+const styles = {
+  background: {
+    backgroundColor: "#e0e7ff", // Light blue background color
+    minHeight: "100vh",
+    padding: "20px",
+  },
+  heading: {
+    color: "#333",
+    textAlign: "center",
+    marginBottom: "20px",
+    fontSize: "2rem",
+    fontWeight: "bold",
+    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)",
+  },
+  card: {
+    borderRadius: "15px",
+    overflow: "hidden",
+    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+    border: "1px solid rgba(255, 255, 255, 0.18)",
+    transition: "transform 0.2s ease-in-out",
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    backdropFilter: "blur(10px)",
+    padding: "15px",
+  },
+  cardLink: {
+    textDecoration: "none",
+    color: "#4A90E2",
+    fontWeight: "bold",
+  },
+  cardText: {
+    color: "#333",
+  },
 };
 
 export default DeployedCVS;
