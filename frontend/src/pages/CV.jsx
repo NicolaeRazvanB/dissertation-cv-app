@@ -185,7 +185,7 @@ const CV = () => {
               <h1 className="text-center">{cvData.cvName}</h1>
               <PDFExport
                 paperSize="A4"
-                margin="0.5cm"
+                // margin="0.5cm"
                 scale={0.5}
                 fileName={cvData.cvName}
                 ref={doc}
