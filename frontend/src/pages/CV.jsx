@@ -12,7 +12,7 @@ const CV = () => {
   const { cvId } = useParams();
   const [cvData, setCvData] = useState(null);
   const [cvPhotoUrl, setCvPhotoUrl] = useState("");
-  const [qrCodeUrl, setQrCodeUrl] = useState(null); // State for QR code URL
+  const [qrCodeUrl, setQrCodeUrl] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const cvRef = useRef();
@@ -31,6 +31,7 @@ const CV = () => {
             Authorization: `Bearer ${token}`,
           },
         };
+
         const response = await fetch(
           `${base_url}api/cv/${cvId}`,
           requestParams

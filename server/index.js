@@ -1,6 +1,5 @@
 const path = require("path");
 const fs = require("fs");
-
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -156,21 +155,120 @@ app.get("/api/image/:filename", (req, res) => {
 });
 
 // Route to fetch a QR code
-app.get("/api/qr/:cvId", (req, res) => {
+app.get("/api/qr/:cvId", async (req, res) => {
   const { cvId } = req.params;
   const qrFolderPath = path.resolve(__dirname, "uploads/qrs"); // Adjusted path
-  const qrFileName = fs
-    .readdirSync(qrFolderPath)
-    .find((file) => file.startsWith(`${cvId}_`));
 
-  if (!qrFileName) {
-    return res.status(404).json({ message: "QR code not found" });
+  try {
+    const files = await readdir(qrFolderPath);
+    const qrFiles = files.filter((file) => file.startsWith(`${cvId}_`));
+
+    if (qrFiles.length === 0) {
+      return res.status(404).json({ message: "QR code not found" });
+    }
+
+    // Sort the files by creation time and get the latest one
+    const latestQrFile = qrFiles
+      .map((file) => ({
+        file,
+        time: fs.statSync(path.join(qrFolderPath, file)).ctime.getTime(),
+      }))
+      .sort((a, b) => b.time - a.time)[0].file;
+
+    const filePath = path.join(qrFolderPath, latestQrFile);
+    res.setHeader("Content-Type", "image/png");
+    const readStream = fs.createReadStream(filePath);
+    readStream.pipe(res);
+  } catch (error) {
+    console.error(`Error fetching QR code: ${error}`);
+    res
+      .status(500)
+      .json({ message: "Error fetching QR code", error: error.toString() });
+  }
+});
+
+// Route to update a QR code
+app.put("/api/qr/:cvId", async (req, res, next) => {
+  const { cvId } = req.params;
+  const { siteName } = req.body;
+
+  // Find and delete existing QR code for the same cvId and siteName
+  try {
+    const files = await readdir(path.resolve("uploads/qrs"));
+    const existingFile = files.find((file) =>
+      file.startsWith(`${cvId}_${siteName}`)
+    );
+    if (existingFile) {
+      const fullPath = path.resolve("uploads/qrs", existingFile);
+      await unlink(fullPath);
+      console.log(`Deleted existing QR file: ${fullPath}`);
+    }
+  } catch (error) {
+    console.error(`Error deleting QR file: ${error}`);
+    return res.status(500).json({
+      message: "Error deleting existing QR file",
+      error: error.toString(),
+    });
   }
 
-  const filePath = path.join(qrFolderPath, qrFileName);
-  res.setHeader("Content-Type", "image/png");
-  const readStream = fs.createReadStream(filePath);
-  readStream.pipe(res);
+  function configureQRMulter() {
+    const storage = multer.diskStorage({
+      destination: "uploads/qrs/", // Directory for QR code uploads
+      filename: function (req, file, cb) {
+        const timestamp = Date.now();
+        const filename = `${file.originalname}_${timestamp}${path.extname(
+          file.originalname
+        )}`;
+        cb(null, filename);
+      },
+    });
+    return multer({ storage: storage });
+  }
+
+  // Multer configuration and file upload handling for QR codes
+  const upload = configureQRMulter().single("qrCode");
+  upload(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      return next(err);
+    } else if (err) {
+      return next(err);
+    }
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+    // File uploaded successfully
+    res.status(200).json({ fileName: req.file.filename });
+  });
+});
+
+// Route to delete QR codes
+app.delete("/api/qr/:cvId", async (req, res) => {
+  const { cvId } = req.params;
+
+  try {
+    const files = await readdir(path.resolve("uploads/qrs"));
+    const regex = new RegExp(`^${cvId}_.*`);
+    const matchingFiles = files.filter((file) => regex.test(file));
+
+    if (matchingFiles.length > 0) {
+      await Promise.all(
+        matchingFiles.map(async (file) => {
+          const fullPath = path.resolve("uploads/qrs", file);
+          await unlink(fullPath);
+          console.log(`Deleted QR file: ${fullPath}`);
+        })
+      );
+      return res.status(200).json({ message: "QR codes deleted successfully" });
+    } else {
+      return res.status(404).json({ message: "QR codes not found" });
+    }
+  } catch (error) {
+    console.error(`Error deleting QR files: ${error}`);
+    return res.status(500).json({
+      message: "Error deleting QR files",
+      error: error.toString(),
+    });
+  }
 });
 
 // Error Handling Middleware

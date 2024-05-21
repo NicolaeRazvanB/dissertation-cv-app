@@ -3,9 +3,17 @@ import { useParams } from "react-router-dom";
 import { requestOptions, base_url } from "../requestOptions";
 import { AuthContext } from "../context/AuthContext";
 import NavbarComponent from "../components/NavbarComponent";
-import { Spinner, Card, Button, Form, FormControl } from "react-bootstrap";
+import {
+  Spinner,
+  Card,
+  Button,
+  Form,
+  FormControl,
+  Alert,
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import QRCode from "qrcode";
+
 const DeployCV = () => {
   const { userInfo } = useContext(AuthContext);
   const { cvId } = useParams();
@@ -14,6 +22,8 @@ const DeployCV = () => {
   const [siteName, setSiteName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isDeployed, setIsDeployed] = useState(false);
+  const [existingDeploymentId, setExistingDeploymentId] = useState(null);
   const navigate = useNavigate();
   const themes = [
     { id: 1, name: "Modern", description: "A sleek and modern design." },
@@ -38,9 +48,25 @@ const DeployCV = () => {
       } else {
         throw new Error("Failed to fetch CV");
       }
+
+      const deployedResponse = await fetch(
+        `${base_url}api/deployedCV/deployed-cvs`,
+        requestParams
+      );
+      if (deployedResponse.ok) {
+        const deployedData = await deployedResponse.json();
+        const existingDeployment = deployedData.find((cv) => cv.cvId === cvId);
+        if (existingDeployment) {
+          setIsDeployed(true);
+          setExistingDeploymentId(existingDeployment._id);
+          setSiteName(existingDeployment.siteName);
+        }
+      } else {
+        throw new Error("Failed to fetch deployed CVs");
+      }
     } catch (error) {
-      console.error("Error fetching CV:", error);
-      setError("Error fetching CVs. Please try again.");
+      console.error("Error fetching CV or deployed CVs:", error);
+      setError("Error fetching data. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -54,7 +80,12 @@ const DeployCV = () => {
     setTheme(selectedTheme);
 
     try {
-      // Generate QR code image
+      // Validate the site name
+      if (!siteName) {
+        throw new Error("Site name cannot be empty");
+      }
+
+      // Generate QR code image with the updated siteName
       const qrUrl = `http://localhost:5173/portfolios/${siteName}`;
       const qrCodeDataUrl = await QRCode.toDataURL(qrUrl);
 
@@ -86,9 +117,9 @@ const DeployCV = () => {
       const { fileName } = await uploadResponse.json();
       const qrCodePath = `/uploads/qrs/${fileName}`;
 
-      // Deploy CV with the QR code path
+      // Deploy or update CV with the QR code path
       const deployParams = {
-        method: "POST",
+        method: isDeployed ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${userInfo.token}`,
@@ -102,10 +133,11 @@ const DeployCV = () => {
         }),
       };
 
-      const response = await fetch(
-        `${base_url}api/deployedCV/deployed-cvs`,
-        deployParams
-      );
+      const deployUrl = isDeployed
+        ? `${base_url}api/deployedCV/${existingDeploymentId}`
+        : `${base_url}api/deployedCV/deployed-cvs`;
+
+      const response = await fetch(deployUrl, deployParams);
 
       if (!response.ok) {
         throw new Error("Failed to deploy CV");
@@ -129,7 +161,7 @@ const DeployCV = () => {
             </Spinner>
           </div>
         ) : error ? (
-          <p>{error}</p>
+          <Alert variant="danger">{error}</Alert>
         ) : (
           <div>
             <h1 className="text-center">{cv?.cvName || "Your CV"}</h1>

@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 import NavbarComponent from "../components/NavbarComponent";
 import { AuthContext } from "../context/AuthContext";
 import { requestOptions, base_url } from "../requestOptions";
+import QRCode from "qrcode";
 
 const DeployedCVS = () => {
   const [deployedCVS, setDeployedCVS] = useState([]);
@@ -55,7 +56,7 @@ const DeployedCVS = () => {
     }
   };
 
-  const handleDelete = async (cvId) => {
+  const handleDelete = async (cv) => {
     setLoading(true);
     try {
       const requestParams = {
@@ -67,8 +68,18 @@ const DeployedCVS = () => {
         method: "DELETE",
       };
 
+      // Delete QR code associated with the CV
+      const deleteQRResponse = await fetch(`${base_url}api/qr/${cv.cvId}`, {
+        ...requestParams,
+        method: "DELETE",
+      });
+
+      if (!deleteQRResponse.ok) {
+        throw new Error("Failed to delete QR code");
+      }
+
       const response = await fetch(
-        `${base_url}api/deployedCV/${cvId}`,
+        `${base_url}api/deployedCV/${cv._id}`,
         requestParams
       );
       if (!response.ok) {
@@ -76,6 +87,7 @@ const DeployedCVS = () => {
       }
 
       // Update the state to remove the deleted CV
+      let cvId = cv._id;
       setDeployedCVS(deployedCVS.filter((cv) => cv._id !== cvId));
     } catch (error) {
       console.error("Error deleting Deployed CV:", error);
@@ -119,6 +131,39 @@ const DeployedCVS = () => {
       );
       if (!response.ok) {
         throw new Error("Failed to update Deployed CV");
+      }
+
+      // Generate new QR code
+      const qrUrl = `http://localhost:5173/portfolios/${editCV.siteName}`;
+      const qrCodeDataUrl = await QRCode.toDataURL(qrUrl);
+
+      // Create a Blob from the Data URL
+      const qrCodeBlob = await (await fetch(qrCodeDataUrl)).blob();
+      const qrCodeFile = new File(
+        [qrCodeBlob],
+        `${editCV.cvId}_${editCV.siteName}.png`,
+        {
+          type: "image/png",
+        }
+      );
+
+      // Create FormData and append the file
+      const formData = new FormData();
+      formData.append("qrCode", qrCodeFile);
+      formData.append("cvId", editCV.cvId);
+      formData.append("siteName", editCV.siteName);
+
+      // Upload QR code image to the server
+      const uploadResponse = await fetch(`${base_url}api/uploadQR`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Failed to upload QR code");
       }
 
       // Update the state with the edited CV
@@ -178,10 +223,7 @@ const DeployedCVS = () => {
                     >
                       Edit
                     </Button>
-                    <Button
-                      variant="danger"
-                      onClick={() => handleDelete(cv._id)}
-                    >
+                    <Button variant="danger" onClick={() => handleDelete(cv)}>
                       Delete
                     </Button>
                   </Card.Body>

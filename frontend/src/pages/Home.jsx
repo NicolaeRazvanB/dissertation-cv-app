@@ -6,10 +6,8 @@ import {
   Row,
   Col,
   Alert,
-  Nav,
   Card,
 } from "react-bootstrap";
-import { Plus, Globe, Pencil } from "react-bootstrap-icons";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import NavbarComponent from "../components/NavbarComponent";
@@ -21,6 +19,7 @@ const HomePage = () => {
   const { userInfo } = useContext(AuthContext);
   const navigate = useNavigate();
   const [cvs, setCvs] = useState([]);
+  const [deployedCVs, setDeployedCVs] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -76,8 +75,38 @@ const HomePage = () => {
     }
   };
 
+  const fetchDeployedCVs = async () => {
+    setLoading(true);
+    try {
+      const requestParams = {
+        ...requestOptions,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+
+      const response = await fetch(
+        `${base_url}api/deployedCV/deployed-cvs`,
+        requestParams
+      );
+      if (response.ok) {
+        let data = await response.json();
+        setDeployedCVs(data);
+      } else {
+        throw new Error("Failed to fetch Deployed CVs");
+      }
+    } catch (error) {
+      console.error("Error fetching Deployed CVs:", error);
+      setError("Error fetching Deployed CVs. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchCVs();
+    fetchDeployedCVs();
   }, [userInfo.cvs]);
 
   const handleAddCV = () => navigate("/addCV");
@@ -100,6 +129,19 @@ const HomePage = () => {
       console.error(error);
       setError("Error deleting CV. Please try again.");
     }
+  };
+
+  const handleLaunchCV = (cvId) => {
+    const deployedCV = deployedCVs.find(
+      (deployedCV) => deployedCV.cvId === cvId
+    );
+    if (deployedCV) {
+      setError(
+        `This CV is already launched. You can view it at: ${base_url}portfolios/${deployedCV.siteName}`
+      );
+      return;
+    }
+    navigate(`/deployCV/${cvId}`);
   };
 
   return (
@@ -151,7 +193,7 @@ const HomePage = () => {
                               className="me-2"
                               onClick={(e) => {
                                 e.stopPropagation(); // Prevent event from bubbling up to the parent
-                                navigate(`/deployCV/${cv._id}`);
+                                handleLaunchCV(cv._id);
                               }}
                             >
                               Launch Portfolio
