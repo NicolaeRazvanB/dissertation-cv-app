@@ -24,12 +24,16 @@ const NavbarComponent = () => {
   };
 
   return (
-    <Navbar bg="primary" variant="dark" sticky="top">
+    <Navbar style={styles.navbar} sticky="top">
       <Container fluid>
         <Row className="w-100">
           <Col xs={4} className="d-flex justify-content-start">
             {location.pathname !== "/" && (
-              <Button variant="outline-light" onClick={handleBack}>
+              <Button
+                variant="outline-light"
+                onClick={handleBack}
+                style={styles.button}
+              >
                 Back
               </Button>
             )}
@@ -40,11 +44,15 @@ const NavbarComponent = () => {
               onClick={handleHomeClick}
               style={{ color: "white", cursor: "pointer" }}
             >
-              <Navbar.Brand>MagickalResume</Navbar.Brand>
+              <Navbar.Brand style={styles.brand}>MagickalResume</Navbar.Brand>
             </Nav.Link>
           </Col>
           <Col xs={4} className="d-flex justify-content-end">
-            <Button variant="outline-light" onClick={handleLogout}>
+            <Button
+              variant="outline-light"
+              onClick={handleLogout}
+              style={styles.button}
+            >
               Logout
             </Button>
           </Col>
@@ -52,6 +60,30 @@ const NavbarComponent = () => {
       </Container>
     </Navbar>
   );
+};
+
+const styles = {
+  navbar: {
+    backgroundColor: "#4A90E2", // Primary color
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+  },
+  button: {
+    borderColor: "white",
+    color: "white",
+    marginLeft: "10px",
+    marginRight: "10px",
+    fontWeight: "bold",
+    transition: "background-color 0.3s ease",
+    "&:hover": {
+      backgroundColor: "rgba(255, 255, 255, 0.2)",
+    },
+  },
+  brand: {
+    fontSize: "1.5rem",
+    fontWeight: "bold",
+    color: "white",
+    textShadow: "1px 1px 2px rgba(0, 0, 0, 0.2)", // Subtle text shadow
+  },
 };
 
 export default NavbarComponent;

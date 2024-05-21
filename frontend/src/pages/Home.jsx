@@ -147,7 +147,7 @@ const HomePage = () => {
   return (
     <>
       <NavbarComponent />
-      <div className="container mt-4">
+      <div style={styles.background}>
         {error && <Alert variant="danger">{error}</Alert>}
         {loading ? (
           <div className="d-flex justify-content-center">
@@ -156,43 +156,38 @@ const HomePage = () => {
         ) : (
           <Container fluid>
             <Row>
-              <Col xs={2} className="bg-light p-3 sidebar">
+              <Col xs={2} style={styles.sidebar}>
                 <SidebarButtons />
               </Col>
 
               <Col>
                 <div className="d-flex justify-content-center">
-                  <h2>My CVs</h2>
+                  <h2 style={styles.heading}>My CVs</h2>
                 </div>
                 <Row
                   xs={1}
                   md={2}
-                  lg={4}
+                  lg={3}
                   className="g-4 justify-content-center"
                 >
                   {cvs.map((cv) => (
                     <Col key={cv._id} className="d-flex justify-content-center">
-                      <Card onClick={() => navigate(`/cv/${cv._id}`)}>
+                      <Card style={styles.card}>
                         <Card.Img
                           variant="top"
                           src={cv.photoUrl || noPhoto}
-                          style={{
-                            width: "100%",
-                            height: "200px",
-                            objectFit: "cover",
-                            border: "2px solid black",
-                          }} // Adjust dimensions as needed
+                          style={styles.cardImg}
                         />
                         <Card.Body className="d-flex flex-column align-items-center justify-content-center">
                           <Card.Title className="text-center mb-4">
                             {cv.cvName}
                           </Card.Title>
-                          <div className="d-flex justify-content-center">
+                          <div style={styles.buttonContainer}>
                             <Button
                               variant="secondary"
                               className="me-2"
                               onClick={(e) => {
-                                e.stopPropagation(); // Prevent event from bubbling up to the parent
+                                e.stopPropagation();
                                 handleLaunchCV(cv._id);
                               }}
                             >
@@ -230,6 +225,59 @@ const HomePage = () => {
       </div>
     </>
   );
+};
+
+const styles = {
+  background: {
+    backgroundColor: "#e0e7ff", // Light blue background color
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "20px",
+    minHeight: "100vh",
+  },
+  sidebar: {
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    backdropFilter: "blur(10px)",
+    padding: "20px",
+    borderRadius: "15px",
+    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+    border: "1px solid rgba(255, 255, 255, 0.18)",
+    maxWidth: "200px", // Adjusted to fit the buttons without strangling them
+  },
+  heading: {
+    color: "#333",
+    marginBottom: "20px",
+    fontSize: "2.5rem",
+    fontWeight: "bold",
+    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)",
+    textAlign: "center", // Centering the heading
+  },
+  card: {
+    color: "#333",
+    width: "100%",
+    maxWidth: "300px",
+    borderRadius: "15px",
+    overflow: "hidden",
+    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+    border: "1px solid rgba(255, 255, 255, 0.18)",
+    transition: "transform 0.2s ease-in-out",
+    cursor: "pointer",
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    backdropFilter: "blur(10px)",
+  },
+  cardImg: {
+    width: "100%",
+    height: "200px",
+    objectFit: "cover",
+    borderBottom: "2px solid #4A90E2",
+  },
+  buttonContainer: {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: "10px",
+  },
 };
 
 export default HomePage;
