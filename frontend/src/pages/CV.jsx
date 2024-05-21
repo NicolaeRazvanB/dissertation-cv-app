@@ -3,11 +3,19 @@ import NavbarComponent from "../components/NavbarComponent";
 import { AuthContext } from "../context/AuthContext";
 import { requestOptions, base_url } from "../requestOptions";
 import { useParams, useNavigate } from "react-router-dom";
-import { Spinner, Button, Alert, Dropdown } from "react-bootstrap";
+import {
+  Spinner,
+  Button,
+  Alert,
+  Dropdown,
+  Col,
+  Row,
+  Container,
+} from "react-bootstrap";
 import { PDFExport } from "@progress/kendo-react-pdf";
 import BusinessCardGenerator from "../components/BusinessCardGenerator";
-import CVPrintTemplate1 from "./CVPrintTemplate1"; // Import the first template
-import CVPrintTemplate2 from "./CVPrintTemplate2"; // Import the second template
+import CVPrintTemplate1 from "./CVPrintTemplate1";
+import CVPrintTemplate2 from "./CVPrintTemplate2";
 
 const CV = () => {
   const { userInfo } = useContext(AuthContext);
@@ -121,38 +129,30 @@ const CV = () => {
           <Spinner animation="border" />
         </div>
       ) : (
-        <div className="container mt-4">
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                justifyContent: "center",
-                marginRight: "20px",
-              }}
-            >
+        <Container className="mt-4">
+          <Row className="mb-3">
+            <Col>
               <Button
-                className="btn btn-primary mb-3"
+                className="btn btn-primary me-2"
                 onClick={downloadPdfDocument}
               >
                 Download as PDF
               </Button>
               <Button
                 variant="danger"
-                className="mb-3"
+                className="me-2"
                 onClick={() => handleDeleteCV(cvId)}
               >
                 Delete
               </Button>
               <Button
                 variant="info"
-                className="mb-3"
+                className="me-2"
                 onClick={() => navigate(`/editCV/${cvId}`)}
               >
                 Edit
               </Button>
-              <Dropdown className="mb-3">
+              <Dropdown className="me-2" style={{ marginTop: "3px" }}>
                 <Dropdown.Toggle variant="secondary" id="dropdown-basic">
                   Select Template
                 </Dropdown.Toggle>
@@ -169,23 +169,15 @@ const CV = () => {
                   </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
-            </div>
-
-            {cvData && (
-              <BusinessCardGenerator
-                cv={cvData}
-                cvPhotoUrl={cvPhotoUrl}
-                qrCodeUrl={qrCodeUrl}
-              />
-            )}
-          </div>
+            </Col>
+          </Row>
 
           {cvData ? (
             <div>
               <h1 className="text-center">{cvData.cvName}</h1>
               <PDFExport
                 paperSize="A4"
-                // margin="0.5cm"
+                margin="0.5cm"
                 scale={0.5}
                 fileName={cvData.cvName}
                 ref={doc}
@@ -214,7 +206,20 @@ const CV = () => {
               </Spinner>
             </div>
           )}
-        </div>
+
+          {cvData && (
+            <Row className="mt-4">
+              <Col className="d-flex flex-column align-items-center">
+                <BusinessCardGenerator
+                  cv={cvData}
+                  cvPhotoUrl={cvPhotoUrl}
+                  qrCodeUrl={qrCodeUrl}
+                  cardStyle={{ width: "50%" }} // Set business card to half the width
+                />
+              </Col>
+            </Row>
+          )}
+        </Container>
       )}
     </>
   );
