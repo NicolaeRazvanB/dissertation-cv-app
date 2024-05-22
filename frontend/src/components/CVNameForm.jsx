@@ -45,7 +45,6 @@ const CVNameForm = ({ cvName, setCvName, setImageFile, currentImage }) => {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.heading}>CV Information</h2>
       <Form style={styles.form}>
         <Form.Group className="mb-3" style={styles.formGroup}>
           <div style={styles.labelContainer}>
