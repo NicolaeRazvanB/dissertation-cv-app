@@ -154,7 +154,7 @@ const styles = {
     marginBottom: "5px",
   },
   input: {
-    width: "100%",
+    width: "120%",
     borderRadius: "10px",
     borderColor: "#ced4da",
     padding: "10px",

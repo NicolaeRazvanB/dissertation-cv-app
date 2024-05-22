@@ -144,10 +144,10 @@ const styles = {
     alignItems: "center",
   },
   input: {
-    width: "100%",
+    width: "110%",
     borderRadius: "10px",
     borderColor: "#ced4da",
-    padding: "10px",
+    padding: "3px",
     fontSize: "1rem",
   },
   buttonContainer: {
