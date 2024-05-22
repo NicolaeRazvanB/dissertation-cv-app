@@ -108,7 +108,10 @@ const EditCV = () => {
   // Render loading spinner if cvData or cvDataUpdated is null
   if (!cvData || !cvDataUpdated) {
     return (
-      <div className="d-flex justify-content-center">
+      <div
+        className="d-flex justify-content-center"
+        style={styles.spinnerContainer}
+      >
         <Spinner animation="border" role="status">
           <span className="visually-hidden">Loading...</span>
         </Spinner>
@@ -119,83 +122,118 @@ const EditCV = () => {
   return (
     <>
       <NavbarComponent />
-      <div className="container mt-4">
-        {error && <Alert variant="danger">{error}</Alert>}
-        {cvDataUpdated && ( // Check if cvDataUpdated is not null before rendering CVNameForm
-          <CVNameForm
-            cvName={cvDataUpdated.cvName}
-            setCvName={(value) =>
-              setCvDataUpdated({ ...cvDataUpdated, cvName: value })
+      <div style={styles.background}>
+        <div style={styles.container}>
+          {error && <Alert variant="danger">{error}</Alert>}
+          {cvDataUpdated && ( // Check if cvDataUpdated is not null before rendering CVNameForm
+            <CVNameForm
+              cvName={cvDataUpdated.cvName}
+              setCvName={(value) =>
+                setCvDataUpdated({ ...cvDataUpdated, cvName: value })
+              }
+              setImageFile={setImageFile} // Pass setImageFile as a prop
+              currentImage={cvData.photoName} // Pass the current image name
+            />
+          )}
+          <AboutForm
+            about={cvDataUpdated.about}
+            setAbout={(value) =>
+              setCvDataUpdated({ ...cvDataUpdated, about: value })
             }
-            setImageFile={setImageFile} // Pass setImageFile as a prop
-            currentImage={cvData.photoName} // Pass the current image name
           />
-        )}
-        <AboutForm
-          about={cvDataUpdated.about}
-          setAbout={(value) =>
-            setCvDataUpdated({ ...cvDataUpdated, about: value })
-          }
-        />
-        <br></br>
-        <PersonalInfoForm
-          personalInfo={cvDataUpdated.personalInfo}
-          setPersonalInfo={(value) =>
-            setCvDataUpdated({ ...cvDataUpdated, personalInfo: value })
-          }
-        />
-        <br></br>
-        <EducationForm
-          education={cvDataUpdated.education}
-          setEducation={(value) =>
-            setCvDataUpdated({ ...cvDataUpdated, education: value })
-          }
-        />
-        <br></br>
-        <TechnicalExperienceForm
-          technicalExperience={cvDataUpdated.technicalExperience}
-          setTechnicalExperience={(value) =>
-            setCvDataUpdated({ ...cvDataUpdated, technicalExperience: value })
-          }
-        />{" "}
-        <br></br>
-        <PersonalProjectsForm
-          personalProjects={cvDataUpdated.personalProjects}
-          setPersonalProjects={(value) =>
-            setCvDataUpdated({ ...cvDataUpdated, personalProjects: value })
-          }
-        />{" "}
-        <br></br>
-        <CertificationsForm
-          certifications={cvDataUpdated.certifications}
-          setCertifications={(value) =>
-            setCvDataUpdated({ ...cvDataUpdated, certifications: value })
-          }
-        />{" "}
-        <br></br>
-        <LanguagesForm
-          languages={cvDataUpdated.languages}
-          setLanguages={(value) =>
-            setCvDataUpdated({ ...cvDataUpdated, languages: value })
-          }
-        />{" "}
-        <br></br>
-        <SkillsForm
-          skills={cvDataUpdated.skills}
-          setSkills={(value) =>
-            setCvDataUpdated({ ...cvDataUpdated, skills: value })
-          }
-        />{" "}
-        <br></br>
-        <div className="d-flex justify-content-center mt-4">
-          <Button variant="primary" onClick={handleSaveCV}>
-            Save Changes
-          </Button>
-        </div>{" "}
-        <br></br>
+          <PersonalInfoForm
+            personalInfo={cvDataUpdated.personalInfo}
+            setPersonalInfo={(value) =>
+              setCvDataUpdated({ ...cvDataUpdated, personalInfo: value })
+            }
+          />
+          <EducationForm
+            education={cvDataUpdated.education}
+            setEducation={(value) =>
+              setCvDataUpdated({ ...cvDataUpdated, education: value })
+            }
+          />
+          <br></br>
+          <TechnicalExperienceForm
+            technicalExperience={cvDataUpdated.technicalExperience}
+            setTechnicalExperience={(value) =>
+              setCvDataUpdated({ ...cvDataUpdated, technicalExperience: value })
+            }
+          />{" "}
+          <br></br>
+          <PersonalProjectsForm
+            personalProjects={cvDataUpdated.personalProjects}
+            setPersonalProjects={(value) =>
+              setCvDataUpdated({ ...cvDataUpdated, personalProjects: value })
+            }
+          />{" "}
+          <br></br>
+          <CertificationsForm
+            certifications={cvDataUpdated.certifications}
+            setCertifications={(value) =>
+              setCvDataUpdated({ ...cvDataUpdated, certifications: value })
+            }
+          />{" "}
+          <br></br>
+          <LanguagesForm
+            languages={cvDataUpdated.languages}
+            setLanguages={(value) =>
+              setCvDataUpdated({ ...cvDataUpdated, languages: value })
+            }
+          />{" "}
+          <br></br>
+          <SkillsForm
+            skills={cvDataUpdated.skills}
+            setSkills={(value) =>
+              setCvDataUpdated({ ...cvDataUpdated, skills: value })
+            }
+          />{" "}
+          <br></br>
+          <div className="d-flex justify-content-center mt-4">
+            <Button
+              variant="primary"
+              onClick={handleSaveCV}
+              style={styles.saveButton}
+            >
+              Save Changes
+            </Button>
+          </div>
+        </div>
       </div>
     </>
   );
+};
+
+const styles = {
+  background: {
+    backgroundColor: "#e0e7ff",
+    minHeight: "100vh",
+    padding: "20px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  container: {
+    maxWidth: "1000px",
+    background:
+      "linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(230, 230, 250, 0.8))",
+    padding: "30px",
+    borderRadius: "15px",
+    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+    backdropFilter: "blur(10px)",
+    border: "1px solid rgba(255, 255, 255, 0.18)",
+    width: "100%",
+  },
+  saveButton: {
+    backgroundColor: "#4A90E2",
+    borderColor: "#4A90E2",
+  },
+  spinnerContainer: {
+    minHeight: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 };
 
 export default EditCV;

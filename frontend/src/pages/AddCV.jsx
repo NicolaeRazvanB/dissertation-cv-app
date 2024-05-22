@@ -13,8 +13,9 @@ import { Button, Alert, ProgressBar } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { requestOptions, base_url } from "../requestOptions";
+
 const AddCV = () => {
-  const { userInfo, dispatch } = useContext(AuthContext);
+  const { userInfo } = useContext(AuthContext);
   const navigate = useNavigate();
   const stepNames = [
     "CV Name",
@@ -115,7 +116,6 @@ const AddCV = () => {
       let responseData = await response.json();
       cvId = responseData._id;
     } catch (error) {
-      // Set the error state to display the error message
       setError("Failed to save CV. Please try again.");
     }
     const formData = new FormData();
@@ -130,13 +130,12 @@ const AddCV = () => {
         const response = await fetch(
           `${base_url}api/uploadPhoto/${cvId}`,
           requestParams
-        ); // Adjust the URL path as needed
+        );
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // If the POST request is successful, you can handle success (e.g., navigate, show message)
         let imageRespData = await response.json();
         imageName = imageRespData.fileName;
         console.log("Image Upload successful");
@@ -168,10 +167,8 @@ const AddCV = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // If the POST request is successful, navigate to /home
       navigate("/");
     } catch (error) {
-      // Set the error state to display the error message
       setError("Failed to save CV. Please try again.");
     }
   };
@@ -179,97 +176,147 @@ const AddCV = () => {
   return (
     <>
       <NavbarComponent />
-      <div className="container mt-4">
-        {error && <Alert variant="danger">{error}</Alert>}
-        <div className="d-flex align-items-center justify-content-center mt-3 mb-3">
-          {stepNames.map((name, index) => (
-            <div key={index} className="d-flex align-items-center">
-              <div
-                style={{
-                  height: "20px",
-                  width: "20px",
-                  borderRadius: "50%",
-                  backgroundColor:
-                    currentStep === index + 1 ? "#007bff" : "#e9ecef",
-                  color: currentStep === index + 1 ? "white" : "black",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "12px",
-                }}
-              >
-                {index + 1}
+      <div style={styles.background}>
+        <div style={styles.container}>
+          {error && <Alert variant="danger">{error}</Alert>}
+          <div className="d-flex align-items-center justify-content-center mt-3 mb-3">
+            {stepNames.map((name, index) => (
+              <div key={index} className="d-flex align-items-center">
+                <div
+                  style={{
+                    height: "30px",
+                    width: "30px",
+                    borderRadius: "50%",
+                    backgroundColor:
+                      currentStep === index + 1 ? "#007bff" : "#e9ecef",
+                    color: currentStep === index + 1 ? "white" : "black",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "14px",
+                  }}
+                >
+                  {index + 1}
+                </div>
+                {index < stepNames.length - 1 && (
+                  <hr style={{ width: "20px", margin: "0 10px" }} />
+                )}
               </div>
-              {index < stepNames.length - 1 && (
-                <hr style={{ width: "20px", margin: "0 10px" }} />
-              )}
-            </div>
-          ))}
-          <span className="ms-2">{stepNames[currentStep - 1]}</span>
-        </div>
-        {/* Conditional rendering based on currentStep */}
-        {currentStep === 1 && (
-          <CVNameForm
-            cvName={cvName}
-            setCvName={setCvName}
-            setImageFile={setImageFile} // Passing setImageFile down as a prop
-          />
-        )}
+            ))}
+            <span className="ms-2" style={styles.stepName}>
+              {stepNames[currentStep - 1]}
+            </span>
+          </div>
+          <br></br>
 
-        {currentStep === 2 && <AboutForm about={about} setAbout={setAbout} />}
-        {currentStep === 3 && (
-          <PersonalInfoForm
-            personalInfo={personalInfo}
-            setPersonalInfo={setPersonalInfo}
-          />
-        )}
-        {currentStep === 4 && (
-          <EducationForm education={education} setEducation={setEducation} />
-        )}
-        {currentStep === 5 && (
-          <TechnicalExperienceForm
-            technicalExperience={technicalExperience}
-            setTechnicalExperience={setTechnicalExperience}
-          />
-        )}
-        {currentStep === 6 && (
-          <PersonalProjectsForm
-            personalProjects={personalProjects}
-            setPersonalProjects={setPersonalProjects}
-          />
-        )}
-        {currentStep === 7 && (
-          <SkillsForm skills={skills} setSkills={setSkills} />
-        )}
-        {currentStep === 8 && (
-          <CertificationsForm
-            certifications={certifications}
-            setCertifications={setCertifications}
-          />
-        )}
-        {currentStep === 9 && (
-          <LanguagesForm languages={languages} setLanguages={setLanguages} />
-        )}
+          {currentStep === 1 && (
+            <CVNameForm
+              cvName={cvName}
+              setCvName={setCvName}
+              setImageFile={setImageFile}
+            />
+          )}
+          {currentStep === 2 && <AboutForm about={about} setAbout={setAbout} />}
+          {currentStep === 3 && (
+            <PersonalInfoForm
+              personalInfo={personalInfo}
+              setPersonalInfo={setPersonalInfo}
+            />
+          )}
+          {currentStep === 4 && (
+            <EducationForm education={education} setEducation={setEducation} />
+          )}
+          {currentStep === 5 && (
+            <TechnicalExperienceForm
+              technicalExperience={technicalExperience}
+              setTechnicalExperience={setTechnicalExperience}
+            />
+          )}
+          {currentStep === 6 && (
+            <PersonalProjectsForm
+              personalProjects={personalProjects}
+              setPersonalProjects={setPersonalProjects}
+            />
+          )}
+          {currentStep === 7 && (
+            <SkillsForm skills={skills} setSkills={setSkills} />
+          )}
+          {currentStep === 8 && (
+            <CertificationsForm
+              certifications={certifications}
+              setCertifications={setCertifications}
+            />
+          )}
+          {currentStep === 9 && (
+            <LanguagesForm languages={languages} setLanguages={setLanguages} />
+          )}
 
-        <div className="d-flex justify-content-between align-items-center mt-3">
-          {currentStep > 1 && (
-            <Button variant="secondary" onClick={handlePrevStep}>
-              Back
-            </Button>
-          )}
-          {isLastStep() ? (
-            <Button variant="primary" onClick={handleSaveCV}>
-              Save CV
-            </Button>
-          ) : (
-            <Button variant="primary" onClick={handleNextStep}>
-              Next
-            </Button>
-          )}
+          <div style={styles.buttonContainer}>
+            {currentStep > 1 && (
+              <Button variant="secondary" onClick={handlePrevStep}>
+                Back
+              </Button>
+            )}
+            {isLastStep() ? (
+              <Button
+                variant="primary"
+                onClick={handleSaveCV}
+                style={styles.nextButton}
+              >
+                Save CV
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                onClick={handleNextStep}
+                style={styles.nextButton}
+              >
+                Next
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </>
   );
+};
+
+const styles = {
+  background: {
+    backgroundColor: "#e0e7ff",
+    minHeight: "100vh",
+    padding: "20px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  container: {
+    maxWidth: "1000px",
+    background:
+      "linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(230, 230, 250, 0.8))",
+    padding: "30px",
+    borderRadius: "15px",
+    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+    backdropFilter: "blur(10px)",
+    border: "1px solid rgba(255, 255, 255, 0.18)",
+    width: "100%",
+  },
+  stepName: {
+    fontSize: "1.2rem",
+    fontWeight: "bold",
+    color: "#333",
+    marginLeft: "10px",
+  },
+  buttonContainer: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: "20px",
+  },
+  nextButton: {
+    backgroundColor: "#4A90E2",
+    borderColor: "#4A90E2",
+  },
 };
 
 export default AddCV;
