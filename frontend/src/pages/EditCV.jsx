@@ -137,53 +137,62 @@ const EditCV = () => {
             setCvDataUpdated({ ...cvDataUpdated, about: value })
           }
         />
+        <br></br>
         <PersonalInfoForm
           personalInfo={cvDataUpdated.personalInfo}
           setPersonalInfo={(value) =>
             setCvDataUpdated({ ...cvDataUpdated, personalInfo: value })
           }
         />
+        <br></br>
         <EducationForm
           education={cvDataUpdated.education}
           setEducation={(value) =>
             setCvDataUpdated({ ...cvDataUpdated, education: value })
           }
         />
+        <br></br>
         <TechnicalExperienceForm
           technicalExperience={cvDataUpdated.technicalExperience}
           setTechnicalExperience={(value) =>
             setCvDataUpdated({ ...cvDataUpdated, technicalExperience: value })
           }
-        />
+        />{" "}
+        <br></br>
         <PersonalProjectsForm
           personalProjects={cvDataUpdated.personalProjects}
           setPersonalProjects={(value) =>
             setCvDataUpdated({ ...cvDataUpdated, personalProjects: value })
           }
-        />
+        />{" "}
+        <br></br>
         <CertificationsForm
           certifications={cvDataUpdated.certifications}
           setCertifications={(value) =>
             setCvDataUpdated({ ...cvDataUpdated, certifications: value })
           }
-        />
+        />{" "}
+        <br></br>
         <LanguagesForm
           languages={cvDataUpdated.languages}
           setLanguages={(value) =>
             setCvDataUpdated({ ...cvDataUpdated, languages: value })
           }
-        />
+        />{" "}
+        <br></br>
         <SkillsForm
           skills={cvDataUpdated.skills}
           setSkills={(value) =>
             setCvDataUpdated({ ...cvDataUpdated, skills: value })
           }
-        />
+        />{" "}
+        <br></br>
         <div className="d-flex justify-content-center mt-4">
           <Button variant="primary" onClick={handleSaveCV}>
             Save Changes
           </Button>
-        </div>
+        </div>{" "}
+        <br></br>
       </div>
     </>
   );
