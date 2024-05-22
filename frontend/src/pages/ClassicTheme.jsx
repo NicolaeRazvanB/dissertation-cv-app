@@ -106,7 +106,7 @@ const ClassicTheme = ({ cv, photoUrl }) => {
           particlesLoaded={particlesLoaded}
           options={options}
         />
-        <NavbarComponent />
+        {/* <NavbarComponent /> */}
         <div className="professional-dark-theme">
           <Container className="mt-5">
             <Row className="justify-content-center">

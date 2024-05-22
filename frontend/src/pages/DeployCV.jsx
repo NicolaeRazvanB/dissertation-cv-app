@@ -138,8 +138,8 @@ const DeployCV = () => {
       if (!response.ok) {
         throw new Error("Failed to deploy CV");
       }
-
-      navigate("/portfolios/" + siteName);
+      navigate("/");
+      window.open("/portfolios/" + siteName, "_blank");
     } catch (error) {
       console.error("Error deploying CV:", error);
       setError("Failed to deploy. Please try again.");

@@ -218,6 +218,7 @@ const DeployedCVS = () => {
                         <Card.Title>
                           <Link
                             to={`/portfolios/${cv.siteName}`}
+                            target="_blank"
                             style={styles.cardLink}
                           >
                             {cv.siteName}
@@ -255,7 +256,7 @@ const DeployedCVS = () => {
             {editCV && (
               <Modal show={showModal} onHide={handleClose}>
                 <Modal.Header closeButton>
-                  <Modal.Title>Edit Deployed CV</Modal.Title>
+                  <Modal.Title>Edit launched portfolio</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                   <Form>
