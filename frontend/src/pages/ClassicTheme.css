@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+.professional-dark-theme {
+    background: linear-gradient(135deg, #1a1a1a, #333);
+    color: #ffffff;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.photo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.glass-card {
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    margin-bottom: 20px;
+}
+
+.glass-card-inner {
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    margin-bottom: 10px;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: #bbbbbb;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.text {
+    font-size: 1rem;
+    color: #cccccc;
+    text-align: center;
+}
+
+.list-item {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.link {
+    color: #1e90ff;
+    text-decoration: none;
+}
+
+.link:hover {
+    text-decoration: underline;
+}

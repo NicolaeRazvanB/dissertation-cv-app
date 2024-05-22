@@ -79,9 +79,6 @@ const LivePortfolio = () => {
     try {
       const response = await fetch(`${base_url}api/image/${photoName}`, {
         ...requestOptions,
-        headers: {
-          Authorization: `Bearer ${userInfo.token}`,
-        },
       });
       if (!response.ok) {
         throw new Error("Failed to fetch image");

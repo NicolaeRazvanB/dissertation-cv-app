@@ -10,6 +10,9 @@ import {
   Form,
   FormControl,
   Alert,
+  Container,
+  Row,
+  Col,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import QRCode from "qrcode";
@@ -80,28 +83,22 @@ const DeployCV = () => {
     setTheme(selectedTheme);
 
     try {
-      // Validate the site name
       if (!siteName) {
         throw new Error("Site name cannot be empty");
       }
 
-      // Generate QR code image with the updated siteName
       const qrUrl = `http://localhost:5173/portfolios/${siteName}`;
       const qrCodeDataUrl = await QRCode.toDataURL(qrUrl);
-
-      // Create a Blob from the Data URL
       const qrCodeBlob = await (await fetch(qrCodeDataUrl)).blob();
       const qrCodeFile = new File([qrCodeBlob], `${cvId}_${siteName}.png`, {
         type: "image/png",
       });
 
-      // Create FormData and append the file
       const formData = new FormData();
       formData.append("qrCode", qrCodeFile);
       formData.append("cvId", cvId);
       formData.append("siteName", siteName);
 
-      // Upload QR code image to the server
       const uploadResponse = await fetch(`${base_url}api/uploadQR`, {
         method: "POST",
         headers: {
@@ -117,7 +114,6 @@ const DeployCV = () => {
       const { fileName } = await uploadResponse.json();
       const qrCodePath = `/uploads/qrs/${fileName}`;
 
-      // Deploy or update CV with the QR code path
       const deployParams = {
         method: isDeployed ? "PUT" : "POST",
         headers: {
@@ -153,50 +149,108 @@ const DeployCV = () => {
   return (
     <div>
       <NavbarComponent />
-      <div className="m-4">
-        {loading ? (
-          <div className="d-flex justify-content-center">
-            <Spinner animation="border" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-          </div>
-        ) : error ? (
-          <Alert variant="danger">{error}</Alert>
-        ) : (
-          <div>
-            <h1 className="text-center">{cv?.cvName || "Your CV"}</h1>
-            <Form className="d-flex justify-content-center">
-              <FormControl
-                type="text"
-                placeholder="Enter site name"
-                className="mr-2"
-                aria-label="Site name"
-                value={siteName}
-                onChange={(e) => setSiteName(e.target.value)}
-                style={{ width: "300px" }}
-              />
-            </Form>
-            <div className="d-flex justify-content-around mt-3">
-              {themes.map((themeOption) => (
-                <Card style={{ width: "18rem" }} key={themeOption.id}>
-                  <Card.Body>
-                    <Card.Title>{themeOption.name}</Card.Title>
-                    <Card.Text>{themeOption.description}</Card.Text>
-                    <Button
-                      variant="primary"
-                      onClick={() => handleSelectTheme(themeOption)}
-                    >
-                      Select This Theme
-                    </Button>
-                  </Card.Body>
-                </Card>
-              ))}
+      <div style={styles.background}>
+        <Container style={styles.container}>
+          {loading ? (
+            <div className="d-flex justify-content-center">
+              <Spinner animation="border" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
             </div>
-          </div>
-        )}
+          ) : error ? (
+            <Alert variant="danger">{error}</Alert>
+          ) : (
+            <div>
+              <h1 style={styles.heading}>{cv?.cvName || "Your CV"}</h1>
+              <Form className="d-flex justify-content-center">
+                <FormControl
+                  type="text"
+                  placeholder="Enter site name"
+                  className="mr-2"
+                  aria-label="Site name"
+                  value={siteName}
+                  onChange={(e) => setSiteName(e.target.value)}
+                  style={styles.input}
+                />
+              </Form>
+              <div className="d-flex justify-content-around mt-3">
+                {themes.map((themeOption) => (
+                  <Card style={styles.card} key={themeOption.id}>
+                    <Card.Body>
+                      <Card.Title>{themeOption.name}</Card.Title>
+                      <Card.Text>{themeOption.description}</Card.Text>
+                      <Button
+                        variant="primary"
+                        onClick={() => handleSelectTheme(themeOption)}
+                      >
+                        Select This Theme
+                      </Button>
+                    </Card.Body>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+        </Container>
       </div>
     </div>
   );
+};
+
+const styles = {
+  background: {
+    backgroundColor: "#e0e7ff",
+    minHeight: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "20px",
+  },
+  container: {
+    maxWidth: "800px",
+    background:
+      "linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(230, 230, 250, 0.8))",
+    padding: "30px",
+    borderRadius: "15px",
+    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+    backdropFilter: "blur(10px)",
+    border: "1px solid rgba(255, 255, 255, 0.18)",
+  },
+  heading: {
+    textAlign: "center",
+    color: "#333",
+    marginBottom: "20px",
+    fontSize: "1.5rem",
+    fontWeight: "bold",
+    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)",
+  },
+  input: {
+    width: "100%",
+    maxWidth: "400px",
+    borderRadius: "10px",
+    borderColor: "#ced4da",
+    padding: "10px",
+    fontSize: "1rem",
+  },
+  card: {
+    width: "18rem",
+    textAlign: "center",
+    borderRadius: "10px",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    transition: "transform 0.3s",
+    backgroundColor: "#f8f9fa",
+  },
+  buttonContainer: {
+    textAlign: "center",
+    marginTop: "20px",
+  },
+  addButton: {
+    backgroundColor: "#4A90E2",
+    borderColor: "#4A90E2",
+  },
+  removeButton: {
+    width: "100%",
+  },
 };
 
 export default DeployCV;
