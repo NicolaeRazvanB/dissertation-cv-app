@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const helmet = require("helmet");
 const cors = require("cors");
+const { spawn } = require("child_process");
 const authRoute = require("./routes/auth");
 const cvRoute = require("./routes/cv");
 const deployedCVRoute = require("./routes/deployedCV");
@@ -269,6 +270,40 @@ app.delete("/api/qr/:cvId", async (req, res) => {
       error: error.toString(),
     });
   }
+});
+
+// New route to run the scraper.py script
+app.get("/api/run-scraper", (req, res, next) => {
+  const scriptPath = path.resolve(__dirname, "scraper.py");
+
+  const runPythonScript = (scriptPath) => {
+    return new Promise((resolve, reject) => {
+      const pythonProcess = spawn("python", [scriptPath]);
+
+      let data = "";
+      let error = "";
+
+      pythonProcess.stdout.on("data", (chunk) => {
+        data += chunk.toString();
+      });
+
+      pythonProcess.stderr.on("data", (chunk) => {
+        error += chunk.toString();
+      });
+
+      pythonProcess.on("close", (code) => {
+        if (code === 0) {
+          resolve(data);
+        } else {
+          reject(new Error(`Python script exited with code ${code}\n${error}`));
+        }
+      });
+    });
+  };
+
+  runPythonScript(scriptPath)
+    .then((result) => res.status(200).json(JSON.parse(result)))
+    .catch((error) => next(error));
 });
 
 // Error Handling Middleware

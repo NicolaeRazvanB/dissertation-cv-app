@@ -176,7 +176,7 @@ const styles = {
     borderColor: "#4A90E2",
   },
   removeButton: {
-    width: "100%",
+    width: "140%",
   },
 };
 

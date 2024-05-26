@@ -191,7 +191,7 @@ const DeployedCVS = () => {
       <Container fluid>
         <div style={styles.background}>
           <Container className="mt-3">
-            <h1 style={styles.heading}>Deployed CVs</h1>
+            <h1 style={styles.heading}>Live Portfolios</h1>
             {loading && (
               <div className="text-center">
                 <Spinner animation="border" role="status">
