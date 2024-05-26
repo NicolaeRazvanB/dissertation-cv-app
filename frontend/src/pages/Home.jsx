@@ -160,20 +160,21 @@ const HomePage = () => {
               <Col>
                 <div className="d-flex justify-content-center">
                   <h2 style={styles.heading}>My CVs</h2>
-                </div>
+                </div>{" "}
+                {error && <Alert variant="danger">{error}</Alert>}
                 <Row
                   xs={1}
                   md={2}
                   lg={3}
                   className="g-4 justify-content-center"
                 >
+                  {" "}
                   {cvs.map((cv) => (
                     <Col key={cv._id} className="d-flex justify-content-center">
                       <Card
                         onClick={() => navigate(`/cv/${cv._id}`)}
                         style={styles.card}
                       >
-                        {error && <Alert variant="danger">{error}</Alert>}
                         <Card.Img
                           variant="top"
                           src={cv.photoUrl || noPhoto}
