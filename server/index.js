@@ -272,9 +272,10 @@ app.delete("/api/qr/:cvId", async (req, res) => {
   }
 });
 
-// New route to run the scraper.py script
-app.get("/api/run-scraper", (req, res, next) => {
+// New route to run the scraper.py script and filter jobs by location, title, and skills
+app.post("/api/run-scraper", (req, res, next) => {
   const scriptPath = path.resolve(__dirname, "scraper.py");
+  const { skills = [], location = "", title = "" } = req.body; // Extract filters from the request body
 
   const runPythonScript = (scriptPath) => {
     return new Promise((resolve, reject) => {
@@ -293,7 +294,16 @@ app.get("/api/run-scraper", (req, res, next) => {
 
       pythonProcess.on("close", (code) => {
         if (code === 0) {
-          resolve(data);
+          try {
+            const result = JSON.parse(data);
+            resolve(result);
+          } catch (parseError) {
+            reject(
+              new Error(
+                `Failed to parse JSON: ${parseError.message}\nOutput: ${data}`
+              )
+            );
+          }
         } else {
           reject(new Error(`Python script exited with code ${code}\n${error}`));
         }
@@ -301,8 +311,41 @@ app.get("/api/run-scraper", (req, res, next) => {
     });
   };
 
+  const filterJobs = (jobs, skills, location, title) => {
+    return jobs.filter((job) => {
+      const matchesSkills =
+        skills.length === 0 ||
+        job.technologies.some((tech) => skills.includes(tech));
+      const matchesLocation =
+        location === "" ||
+        job.location.toLowerCase().includes(location.toLowerCase());
+      const matchesTitle =
+        title === "" || job.title.toLowerCase().includes(title.toLowerCase());
+      return matchesSkills && matchesLocation && matchesTitle;
+    });
+  };
+
+  const recommendJobs = (jobs) => {
+    // Here you can add logic to recommend jobs, for example, based on the number of matching skills
+    return jobs.sort((a, b) => {
+      const aSkillMatches = a.technologies.filter((tech) =>
+        skills.includes(tech)
+      ).length;
+      const bSkillMatches = b.technologies.filter((tech) =>
+        skills.includes(tech)
+      ).length;
+      return bSkillMatches - aSkillMatches; // Descending order
+    });
+  };
+
   runPythonScript(scriptPath)
-    .then((result) => res.status(200).json(JSON.parse(result)))
+    .then((jobs) => {
+      let filteredJobs = filterJobs(jobs, skills, location, title);
+      let recommendedJobs = recommendJobs(filteredJobs);
+      res
+        .status(200)
+        .json({ count: recommendedJobs.length, jobs: recommendedJobs });
+    })
     .catch((error) => next(error));
 });
 

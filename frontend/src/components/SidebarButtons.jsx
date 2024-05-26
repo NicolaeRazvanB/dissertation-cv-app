@@ -2,7 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { Button, Nav } from "react-bootstrap";
-import { Plus, Globe, Pencil } from "react-bootstrap-icons";
+import { Plus, Globe, Pencil, TerminalFill } from "react-bootstrap-icons";
 import logo from "../../public/logo.webp"; // Adjust the path to your logo
 
 const SidebarButtons = () => {
@@ -12,7 +12,7 @@ const SidebarButtons = () => {
   const handleAddCV = () => navigate("/addCV");
   const handleViewWebsites = () => navigate("/portfolios");
   const handleEditProfile = () => navigate("/editProfile");
-
+  const handleJobFinder = () => navigate("/jobfinder");
   return (
     <div style={styles.sidebarContainer}>
       <div style={styles.logoContainer}>
@@ -39,6 +39,13 @@ const SidebarButtons = () => {
           className="text-decoration-none text-white w-100"
         >
           <Pencil /> Edit Profile
+        </Button>
+        <Button
+          style={styles.button}
+          onClick={handleJobFinder}
+          className="text-decoration-none text-white w-100"
+        >
+          <TerminalFill /> Job Finder
         </Button>
       </Nav>
     </div>

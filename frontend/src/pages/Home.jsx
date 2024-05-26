@@ -14,7 +14,6 @@ import NavbarComponent from "../components/NavbarComponent";
 import SidebarButtons from "../components/SidebarButtons";
 import { requestOptions, base_url } from "../requestOptions";
 import noPhoto from "../../public/noPhoto.webp";
-
 const HomePage = () => {
   const { userInfo } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -155,10 +154,9 @@ const HomePage = () => {
         ) : (
           <Container fluid>
             <Row>
-              <Col xs={2} style={styles.sidebar}>
+              <Col xs={12} md={3} lg={2} style={styles.sidebar}>
                 <SidebarButtons />
               </Col>
-
               <Col>
                 <div className="d-flex justify-content-center">
                   <h2 style={styles.heading}>My CVs</h2>
@@ -170,63 +168,56 @@ const HomePage = () => {
                   className="g-4 justify-content-center"
                 >
                   {cvs.map((cv) => (
-                    <>
-                      {" "}
-                      <Col
-                        key={cv._id}
-                        className="d-flex justify-content-center"
+                    <Col key={cv._id} className="d-flex justify-content-center">
+                      <Card
+                        onClick={() => navigate(`/cv/${cv._id}`)}
+                        style={styles.card}
                       >
-                        {" "}
-                        <Card
-                          onClick={() => navigate(`/cv/${cv._id}`)}
-                          style={styles.card}
-                        >
-                          {error && <Alert variant="danger">{error}</Alert>}
-                          <Card.Img
-                            variant="top"
-                            src={cv.photoUrl || noPhoto}
-                            style={styles.cardImg}
-                          />
-                          <Card.Body className="d-flex flex-column align-items-center justify-content-center">
-                            <Card.Title className="text-center mb-4">
-                              {cv.cvName}
-                            </Card.Title>
-                            <div style={styles.buttonContainer}>
-                              <Button
-                                variant="secondary"
-                                className="me-2"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleLaunchCV(cv._id);
-                                }}
-                              >
-                                Launch Portfolio
-                              </Button>
-                              <Button
-                                variant="info"
-                                className="me-2"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate(`/editCV/${cv._id}`);
-                                }}
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                variant="danger"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteCV(cv._id);
-                                }}
-                              >
-                                Delete
-                              </Button>
-                            </div>
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                    </>
-                  ))}
+                        {error && <Alert variant="danger">{error}</Alert>}
+                        <Card.Img
+                          variant="top"
+                          src={cv.photoUrl || noPhoto}
+                          style={styles.cardImg}
+                        />
+                        <Card.Body className="d-flex flex-column align-items-center justify-content-center">
+                          <Card.Title className="text-center mb-4">
+                            {cv.cvName}
+                          </Card.Title>
+                          <div style={styles.buttonContainer}>
+                            <Button
+                              variant="secondary"
+                              className="me-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleLaunchCV(cv._id);
+                              }}
+                            >
+                              Launch Portfolio
+                            </Button>
+                            <Button
+                              variant="info"
+                              className="me-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/editCV/${cv._id}`);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="danger"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteCV(cv._id);
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  ))}{" "}
                 </Row>
               </Col>
             </Row>

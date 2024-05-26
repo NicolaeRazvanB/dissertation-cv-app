@@ -12,6 +12,7 @@ import CV from "./pages/CV.jsx";
 import EditCV from "./pages/EditCV.jsx";
 import DeployCV from "./pages/DeployCV.jsx";
 import LivePortfolio from "./pages/LivePortfolio.jsx";
+import JobRecommendation from "./pages/JobRecommendation.jsx";
 function App() {
   const { userInfo } = useContext(AuthContext);
 
@@ -38,6 +39,10 @@ function App() {
         />
         <Route path="/addCV" element={userInfo ? <AddCV /> : <Login />} />
         <Route path="/cv/:cvId" element={userInfo ? <CV /> : <Login />} />
+        <Route
+          path="/jobfinder"
+          element={userInfo ? <JobRecommendation /> : <Login />}
+        />
         <Route
           path="/editCV/:cvId"
           element={userInfo ? <EditCV /> : <Login />}
