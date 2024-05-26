@@ -1,4 +1,4 @@
-let base_url = "http://localhost:7777/";
+let base_url = import.meta.env.BACK || "http://localhost:7777/";
 let requestOptions = {
   method: "GET",
   mode: "cors",
