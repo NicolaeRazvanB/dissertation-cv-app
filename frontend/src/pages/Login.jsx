@@ -2,7 +2,7 @@ import React, { useContext, useRef, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Button, Form, Alert, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import logo from "../../public/logo.webp"; // Adjust the path to your logo
+import logo from "../../assets/Logo.jpg";
 
 import { requestOptions, base_url } from "../requestOptions";
 

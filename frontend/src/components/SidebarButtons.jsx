@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { Button, Nav } from "react-bootstrap";
 import { Plus, Globe, Pencil, TerminalFill } from "react-bootstrap-icons";
-import logo from "../../public/logo.webp"; // Adjust the path to your logo
+import logo from "../../assets/Logo.jpg";
 
 const SidebarButtons = () => {
   const navigate = useNavigate(); // Use the hook

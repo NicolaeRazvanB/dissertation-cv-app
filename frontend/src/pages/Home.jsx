@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import NavbarComponent from "../components/NavbarComponent";
 import SidebarButtons from "../components/SidebarButtons";
 import { requestOptions, base_url } from "../requestOptions";
-import noPhoto from "../../public/noPhoto.webp";
+import noPhoto from "../../assets/noPhoto.webp";
 const HomePage = () => {
   const { userInfo } = useContext(AuthContext);
   const navigate = useNavigate();

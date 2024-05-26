@@ -13,7 +13,7 @@ import { requestOptions, base_url } from "../requestOptions";
 import { useNavigate } from "react-router-dom";
 import NavbarComponent from "../components/NavbarComponent";
 import SidebarButtons from "../components/SidebarButtons";
-import logo from "../../public/logo.webp"; // Adjust the path to your logo
+import logo from "../../assets/Logo.jpg";
 
 const EditProfile = () => {
   const { userInfo } = useContext(AuthContext);

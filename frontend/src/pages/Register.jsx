@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Container, Form, Button, Alert, Row, Col } from "react-bootstrap";
 import { requestOptions, base_url } from "../requestOptions";
 import { useNavigate, Link } from "react-router-dom";
-import logo from "../../public/logo.webp"; // Adjust the path to your logo
+import logo from "../../assets/Logo.jpg";
 
 const Register = () => {
   const [formData, setFormData] = useState({
