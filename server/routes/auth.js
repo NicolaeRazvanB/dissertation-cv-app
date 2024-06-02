@@ -13,14 +13,12 @@ const saltRounds = 10;
 //REGISTER USER
 router.post("/register", async (request, response, next) => {
   try {
-    // Check if email already exists in the database
     const existingUser = await User.findOne({ email: request.body.email });
     if (existingUser) {
-      return response.status(409).json({ message: "Email is already in use." }); // 409 Conflict
+      return response.status(409).json({ message: "Email is already in use." });
     }
 
-    // If email not in use, proceed with creating the new user
-    const salt = await bcrypt.genSalt(saltRounds); // Ensure saltRounds is defined or use a default value, e.g., 10
+    const salt = await bcrypt.genSalt(saltRounds);
     const cryptedPassword = await bcrypt.hash(request.body.password, salt);
 
     const newUser = new User({
@@ -31,7 +29,7 @@ router.post("/register", async (request, response, next) => {
     });
 
     const user = await newUser.save();
-    // Optionally, exclude the password from the response
+
     const { password, ...userWithoutPassword } = user.toObject();
     response.status(201).json(userWithoutPassword);
   } catch (error) {
@@ -62,7 +60,7 @@ router.post("/login", async (request, response, next) => {
     }
 
     const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, {
-      expiresIn: "7 days",
+      expiresIn: "30 days",
     });
 
     const { password: _, ...userData } = user.toObject();

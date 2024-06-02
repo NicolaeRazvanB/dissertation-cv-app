@@ -116,7 +116,7 @@ if __name__ == "__main__":
 
     elapsed_time = end_time - start_time  # Calculate the elapsed time
 
-    jobs.pop()  # Remove the last job if it's the newsletter job
+    # jobs.pop()  # Remove the last job if it's the newsletter job
 
     # Print jobs as JSON
     jobs_json = json.dumps(jobs)

@@ -16,7 +16,7 @@ const multer = require("multer");
 const util = require("util");
 const unlink = util.promisify(fs.unlink);
 const readdir = util.promisify(fs.readdir);
-
+const scrapeJobs = require("./scraper");
 // Database Connection
 mongoose
   .connect(process.env.MONGO_URL)
@@ -273,43 +273,8 @@ app.delete("/api/qr/:cvId", async (req, res) => {
 });
 
 // New route to run the scraper.py script and filter jobs by location, title, and skills
-app.post("/api/run-scraper", (req, res, next) => {
-  const scriptPath = path.resolve(__dirname, "scraper.py");
+app.post("/api/run-scraper", async (req, res, next) => {
   const { skills = [], location = "", title = "" } = req.body; // Extract filters from the request body
-
-  const runPythonScript = (scriptPath) => {
-    return new Promise((resolve, reject) => {
-      const pythonProcess = spawn("python", [scriptPath]);
-
-      let data = "";
-      let error = "";
-
-      pythonProcess.stdout.on("data", (chunk) => {
-        data += chunk.toString();
-      });
-
-      pythonProcess.stderr.on("data", (chunk) => {
-        error += chunk.toString();
-      });
-
-      pythonProcess.on("close", (code) => {
-        if (code === 0) {
-          try {
-            const result = JSON.parse(data);
-            resolve(result);
-          } catch (parseError) {
-            reject(
-              new Error(
-                `Failed to parse JSON: ${parseError.message}\nOutput: ${data}`
-              )
-            );
-          }
-        } else {
-          reject(new Error(`Python script exited with code ${code}\n${error}`));
-        }
-      });
-    });
-  };
 
   const filterJobs = (jobs, skills, location, title) => {
     return jobs.filter((job) => {
@@ -338,15 +303,16 @@ app.post("/api/run-scraper", (req, res, next) => {
     });
   };
 
-  runPythonScript(scriptPath)
-    .then((jobs) => {
-      let filteredJobs = filterJobs(jobs, skills, location, title);
-      let recommendedJobs = recommendJobs(filteredJobs);
-      res
-        .status(200)
-        .json({ count: recommendedJobs.length, jobs: recommendedJobs });
-    })
-    .catch((error) => next(error));
+  try {
+    let jobs = await scrapeJobs("https://devjob.ro/jobs");
+    let filteredJobs = filterJobs(jobs, skills, location, title);
+    let recommendedJobs = recommendJobs(filteredJobs);
+    res
+      .status(200)
+      .json({ count: recommendedJobs.length, jobs: recommendedJobs });
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Error Handling Middleware
