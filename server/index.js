@@ -79,7 +79,7 @@ app.post("/api/uploadPhoto/:cvId", async (req, res, next) => {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
-    // File uploaded successfully
+
     res.status(200).json({ fileName: req.file.filename, cvId: cvId });
   });
 });
@@ -149,7 +149,7 @@ app.get("/api/image/:filename", (req, res) => {
     }
 
     // Set the correct content type
-    res.setHeader("Content-Type", "image/jpeg"); // Adjust the content type according to your file types, e.g., image/png
+    res.setHeader("Content-Type", "image/jpeg"); // Adjust the content type according to your file types
     const readStream = fs.createReadStream(filePath);
     readStream.pipe(res);
   });
@@ -158,7 +158,7 @@ app.get("/api/image/:filename", (req, res) => {
 // Route to fetch a QR code
 app.get("/api/qr/:cvId", async (req, res) => {
   const { cvId } = req.params;
-  const qrFolderPath = path.resolve(__dirname, "uploads/qrs"); // Adjusted path
+  const qrFolderPath = path.resolve(__dirname, "uploads/qrs");
 
   try {
     const files = await readdir(qrFolderPath);
@@ -272,9 +272,8 @@ app.delete("/api/qr/:cvId", async (req, res) => {
   }
 });
 
-// New route to run the scraper.py script and filter jobs by location, title, and skills
 app.post("/api/run-scraper", async (req, res, next) => {
-  const { skills = [], location = "", title = "" } = req.body; // Extract filters from the request body
+  const { skills = [], location = "", title = "" } = req.body;
 
   const filterJobs = (jobs, skills, location, title) => {
     return jobs.filter((job) => {
@@ -291,7 +290,6 @@ app.post("/api/run-scraper", async (req, res, next) => {
   };
 
   const recommendJobs = (jobs) => {
-    // Here you can add logic to recommend jobs, for example, based on the number of matching skills
     return jobs.sort((a, b) => {
       const aSkillMatches = a.technologies.filter((tech) =>
         skills.includes(tech)
@@ -299,7 +297,7 @@ app.post("/api/run-scraper", async (req, res, next) => {
       const bSkillMatches = b.technologies.filter((tech) =>
         skills.includes(tech)
       ).length;
-      return bSkillMatches - aSkillMatches; // Descending order
+      return bSkillMatches - aSkillMatches;
     });
   };
 

@@ -122,7 +122,7 @@ router.delete("/:id", verifyToken, async (req, res, next) => {
 //GET BY SITE NAME FROM PATH
 router.get("/deployed-cvs/by-name/:siteName", async (req, res, next) => {
   try {
-    const { siteName } = req.params; // Now using path parameters
+    const { siteName } = req.params;
     if (!siteName) {
       return res.status(400).json({ message: "Site name is required." });
     }

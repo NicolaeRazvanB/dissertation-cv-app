@@ -88,23 +88,19 @@ router.get("/user", verifyToken, async (req, res, next) => {
 //UPDATE USER
 router.put("/user", verifyToken, async (req, res, next) => {
   try {
-    // Check if password change is requested
     if (req.body.password) {
       const salt = await bcrypt.genSalt(10);
       const cryptedPassword = await bcrypt.hash(req.body.password, salt);
 
-      // Update the password in the request body to be the hashed version
       req.body.password = cryptedPassword;
     }
 
-    // Update user with potentially new hashed password and other details
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
       { $set: req.body },
       { new: true }
     );
 
-    // Remove the password before sending the user details back
     const { password, ...userDetails } = updatedUser.toObject();
     res.json(userDetails);
   } catch (error) {
@@ -112,22 +108,18 @@ router.put("/user", verifyToken, async (req, res, next) => {
   }
 });
 
-//DELETE USER
 router.delete("/user", verifyToken, async (req, res, next) => {
   try {
-    // Check if the user exists (optional, based on your logic in verifyToken)
     const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
 
-    // Check for existing CVs
     const cvCount = await CV.countDocuments({ userId: req.user.id });
     if (cvCount > 0) {
       await CV.deleteMany({ userId: req.user.id });
     }
 
-    // Check for existing deployed CVs
     const deployedCvCount = await DeployedCV.countDocuments({
       userId: req.user.id,
     });
@@ -135,7 +127,6 @@ router.delete("/user", verifyToken, async (req, res, next) => {
       await DeployedCV.deleteMany({ userId: req.user.id });
     }
 
-    // Proceed to delete the user after checking/deleting CVs and deployed CVs
     await User.findByIdAndDelete(req.user.id);
 
     let message = "User deleted successfully.";
